@@ -1,8 +1,14 @@
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 
 #include "BomberManGameMode.h"
+#include "Camera/BomberManCamera.h"
+
+// Engine includes
+#include "EngineUtils.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Kismet/GameplayStatics.h"
+
+
 
 ABomberManGameMode::ABomberManGameMode()
 {
@@ -25,4 +31,12 @@ void ABomberManGameMode::BeginPlay()
 {
 	// Creating another player so that there are two players
 	UGameplayStatics::CreatePlayer(GetWorld(), 1);
+
+	// Getting the camera from world and setting it as the camera to be used as target to render.
+	TActorIterator<ABomberManCamera> itr(GetWorld());
+	if (itr)
+	{
+		ABomberManCamera* bombermanCamera = *itr;
+		UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(bombermanCamera);
+	}
 }

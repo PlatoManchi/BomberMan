@@ -22,14 +22,6 @@ public:
 	*/
 	ABomberManCharacter();
 
-	/** Returns CameraBoom subobject 
-	*/
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-
-	/** Returns FollowCamera subobject 
-	*/
-	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-
 protected:
 	/** Called for forwards/backward input 
 	*	@param Value The value representing input in vertical axis
@@ -40,17 +32,5 @@ protected:
 	*	@param Value The value representing input in horizontal axis
 	*/
 	void MoveRight(float Value);
-
-private:
-
-	/** Camera boom positioning the camera behind the character 
-	*/
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* CameraBoom;
-
-	/** Follow camera 
-	*/
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* FollowCamera;
 };
 
