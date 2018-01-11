@@ -35,6 +35,34 @@ ABomberManCharacter::ABomberManCharacter()
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
 
+void ABomberManCharacter::PossessedBy(AController * NewController)
+{
+	// Set character color based on the controller id.
+	APlayerController* playerController = Cast<APlayerController>(NewController);
+	if (playerController)
+	{
+		int32 id = UGameplayStatics::GetPlayerControllerID(playerController);
+
+		// Loop through all materials, create dynamic material instance and set the color.
+		for (int32 i = 0; i < GetMesh()->GetNumMaterials(); ++i)
+		{
+			UMaterialInterface* materialInterface = GetMesh()->GetMaterials()[i];
+			UMaterialInstanceDynamic* dynMaterial = UMaterialInstanceDynamic::Create(materialInterface, this);
+
+			if (id == 0)
+			{
+				dynMaterial->SetVectorParameterValue("BodyColor", FLinearColor::Blue);
+			}
+			else if (id == 1)
+			{
+				dynMaterial->SetVectorParameterValue("BodyColor", FLinearColor::Red);
+			}
+
+			GetMesh()->SetMaterial(i, dynMaterial);
+		}
+	}
+}
+
 
 void ABomberManCharacter::MoveForward(float Value)
 {

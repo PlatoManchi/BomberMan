@@ -23,6 +23,11 @@ public:
 	ABomberManCharacter();
 
 protected:
+	/** Called when this Pawn is possessed.
+	*	@param NewController The controller possessing this pawn
+	*/
+	virtual void PossessedBy(AController* NewController) override;
+
 	/** Called for forwards/backward input 
 	*	@param Value The value representing input in vertical axis
 	*/
@@ -32,5 +37,11 @@ protected:
 	*	@param Value The value representing input in horizontal axis
 	*/
 	void MoveRight(float Value);
+
+
+	/** The material that is used by character
+	*/
+	UPROPERTY(EditAnywhere)
+	UMaterialInterface* Material;
 };
 
