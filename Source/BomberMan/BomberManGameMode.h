@@ -13,6 +13,10 @@ class ABomberManGameMode : public AGameModeBase
 
 public:
 	ABomberManGameMode();
+
+protected:
+	// Called once when game starts
+	void BeginPlay() override;
 };
 
 
