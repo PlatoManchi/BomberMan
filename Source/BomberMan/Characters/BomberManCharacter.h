@@ -8,6 +8,7 @@
 
 // Forward decelerations
 class ABomberManController;
+class ABomb;
 
 UCLASS(config=Game)
 class ABomberManCharacter : public ACharacter
@@ -38,10 +39,17 @@ protected:
 	*/
 	void MoveRight(float Value);
 
-
-	/** The material that is used by character
+	/** If able to, place the bomb at character's location.
 	*/
-	UPROPERTY(EditAnywhere)
-	UMaterialInterface* Material;
+	void PlaceBomb();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "BomberManCharacter")
+	void SetPlayerID(int32 id);
+
+private:
+	/** Type of bomb this character can place.
+	*/
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BomberManCharacter|Weapon", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ABomb> BombTypeClass;
 };
 

@@ -1,6 +1,7 @@
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 
 #include "BomberManCharacter.h"
+#include "Gameplay/Bomb.h"
 
 // Engine includes
 #include "HeadMountedDisplayFunctionLibrary.h"
@@ -11,6 +12,7 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "UObject/ConstructorHelpers.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ABomberManCharacter
@@ -30,6 +32,14 @@ ABomberManCharacter::ABomberManCharacter()
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
+
+	// set default controller class to our Blueprinted controller
+	static ConstructorHelpers::FClassFinder<AActor> BombTypeBPClass(TEXT("/Game/Blueprints/Gameplay/BP_Bomb"));
+	if (BombTypeBPClass.Class != NULL)
+	{
+		BombTypeClass = BombTypeBPClass.Class;
+	}
+
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
@@ -60,6 +70,8 @@ void ABomberManCharacter::PossessedBy(AController * NewController)
 
 			GetMesh()->SetMaterial(i, dynMaterial);
 		}
+
+		SetPlayerID(id);
 	}
 }
 
@@ -90,5 +102,15 @@ void ABomberManCharacter::MoveRight(float Value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
+	}
+}
+
+void ABomberManCharacter::PlaceBomb()
+{
+	if (BombTypeClass)
+	{
+		FVector location = GetActorLocation();
+		location.Z = 50.0f;
+		GetWorld()->SpawnActor<ABomb>(BombTypeClass, location, FRotator::ZeroRotator);
 	}
 }

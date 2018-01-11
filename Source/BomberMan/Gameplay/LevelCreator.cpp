@@ -38,7 +38,11 @@ void ALevelCreator::ResetLevel()
 		{
 			if (MapData[y][x] == 1)
 			{
+				// Offset location by LevelCreator location so that level is always made around LevelCreator location
+				// instead of being made 
 				FVector location(x * 100 + 50 - 650, y * 100 + 50 - 650, 50);
+				location = location + GetActorLocation();
+
 				ABaseBlock* block = GetIndestructibleBlock();
 				block->SetActorLocation(location);
 			}
@@ -76,6 +80,9 @@ ABaseBlock* ALevelCreator::GetIndestructibleBlock()
 	else
 	{
 		result = GetWorld()->SpawnActor<ABaseBlock>(IndestructibleBlockClass, FVector::ZeroVector, FRotator::ZeroRotator);
+
+		// Weld the actor to LevelCreator so that if LevelCreator is moved, the whole level will move.
+		result->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, true));
 	}
 
 	// Initializing the block

@@ -58,6 +58,10 @@ void ABomberManCamera::SetCameraToCharacterMid()
 	// Set camera in middle of the characters
 	if (playerCount > 0)
 	{
+		// Adding origin as another point, so that camera panning will always favored towards the center of level.
+		TotalPositions = TotalPositions + FVector::ZeroVector;
+		playerCount++;
+
 		FVector averagePosition = TotalPositions / playerCount;
 
 		SetActorLocation(averagePosition);

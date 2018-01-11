@@ -2,6 +2,7 @@
 
 #include "BomberManGameMode.h"
 #include "Camera/BomberManCamera.h"
+#include "Characters/BomberManPlayerState.h"
 
 // Engine includes
 #include "EngineUtils.h"
@@ -12,19 +13,22 @@
 
 ABomberManGameMode::ABomberManGameMode()
 {
-	// set default pawn class to our Blueprinted character
+	// Set default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprints/Characters/BP_ThirdPersonCharacter"));
 	if (PlayerPawnBPClass.Class != NULL)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 
-	// set default controller class to our Blueprinted controller
+	// Set default controller class to our Blueprinted controller
 	static ConstructorHelpers::FClassFinder<AController> PlayerControllerBPClass(TEXT("/Game/Blueprints/Characters/BP_BomberManController"));
 	if (PlayerControllerBPClass.Class != NULL)
 	{
 		PlayerControllerClass = PlayerControllerBPClass.Class;
 	}
+
+	// Set default player state class
+	PlayerStateClass = ABomberManPlayerState::StaticClass();
 }
 
 void ABomberManGameMode::BeginPlay()

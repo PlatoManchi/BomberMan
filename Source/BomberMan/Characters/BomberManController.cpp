@@ -20,13 +20,17 @@ void ABomberManController::SetupInputComponent()
 	int32 id = GetLocalPlayer()->GetControllerId();
 	if (id == 0)
 	{
-		InputComponent->BindAxis("MoveForward_p1", this, &ABomberManController::MoveForward);
-		InputComponent->BindAxis("MoveRight_p1", this, &ABomberManController::MoveRight);
+		InputComponent->BindAxis("MoveForward_P1", this, &ABomberManController::MoveForward);
+		InputComponent->BindAxis("MoveRight_P1", this, &ABomberManController::MoveRight);
+
+		InputComponent->BindAction("PlaceBomb_P1", EInputEvent::IE_Released, this, &ABomberManController::PlaceBomb);
 	}
 	else if (id == 1)
 	{
-		InputComponent->BindAxis("MoveForward_p2", this, &ABomberManController::MoveForward);
-		InputComponent->BindAxis("MoveRight_p2", this, &ABomberManController::MoveRight);
+		InputComponent->BindAxis("MoveForward_P2", this, &ABomberManController::MoveForward);
+		InputComponent->BindAxis("MoveRight_P2", this, &ABomberManController::MoveRight);
+
+		InputComponent->BindAction("PlaceBomb_P2", EInputEvent::IE_Released, this, &ABomberManController::PlaceBomb);
 	}
 }
 
@@ -43,5 +47,13 @@ void ABomberManController::MoveRight(float Value)
 	if (BomberManCharacter)
 	{
 		BomberManCharacter->MoveRight(Value);
+	}
+}
+
+void ABomberManController::PlaceBomb()
+{
+	if (BomberManCharacter)
+	{
+		BomberManCharacter->PlaceBomb();
 	}
 }

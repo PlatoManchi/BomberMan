@@ -40,6 +40,10 @@ protected:
 	*/
 	void MoveRight(float Value);
 
+	/** If able to, place the bomb at player's position.
+	*/
+	void PlaceBomb();
+
 	// Caching the character
 	ABomberManCharacter* BomberManCharacter;
 
