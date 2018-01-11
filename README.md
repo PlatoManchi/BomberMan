@@ -1,3 +1,3 @@
 BomberMan
 
-A crude protyping of BomberMan game in UE4.18.2
+A crude protype of BomberMan game in UE4.18.2
