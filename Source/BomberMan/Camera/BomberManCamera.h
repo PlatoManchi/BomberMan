@@ -27,11 +27,21 @@ protected:
 	*/
 	virtual void BeginPlay() override;
 
-	/* Called every frame
+	/** Called every frame
+	*	@param DeltaTime Time elapsed since last frame
 	*/
 	virtual void Tick(float DeltaTime) override;
 
 private:
+	/** Calculates the mid point between all characters and move the camera to the mid point.
+	*/
+	void SetCameraToCharacterMid();
+
+	/** Takes care of the zooming in and out
+	*	@param DeltaTime Time elapsed since last frame
+	*/
+	void ManageCameraZoom(float DeltaTime);
+
 	/** Spring component that handles the camera
 	*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
