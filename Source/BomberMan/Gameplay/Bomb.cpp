@@ -98,8 +98,6 @@ void ABomb::Explode()
 			{
 				transform.SetLocation(location + GetActorLocation());
 				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticleTemplate, transform, true);
-
-				//UGameplayStatics::ApplyRadialDamage(GetWorld(), 50.0f, transform.GetLocation(), 60.0f, UDamageType::StaticClass(), TArray<AActor*>(), this, OwningCharacter->Controller, true);
 			}
 			
 			// Up - Spawn particles
@@ -126,6 +124,12 @@ void ABomb::Explode()
 
 void ABomb::DealDamage()
 {
+	/** All bombs have two colliders one horizontal and one vertical
+		Ray cast right and left side to see if there are any blocks that block the explosion.
+		Then calculate the distance between them and extend the collider to that size.
+		Do the same for up and down.
+		Get all the actors inside the colliders and damage them.
+	*/
 	TArray<AActor*> AllOverlappingActors;
 
 	TArray<AActor*> tmpActors;
