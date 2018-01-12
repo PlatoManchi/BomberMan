@@ -23,6 +23,17 @@ public:
 	/** Resets the level to initial conditions
 	*/
 	void ResetLevel();
+
+	/** Variables to hold the tile height and width
+	*/
+	const static float TILE_X_LENGTH;
+	const static float TILE_Y_LENGTH;
+	const static float TILE_Z_LENGTH;
+
+	/** Variables to hold the map size
+	*/
+	const static int32 MAP_WIDTH;
+	const static int32 MAP_HEIGHT;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

@@ -7,6 +7,12 @@
 #include "Components/StaticMeshComponent.h"
 #include "UObject/ConstructorHelpers.h"
 
+const float ALevelCreator::TILE_X_LENGTH = 100.0f;
+const float ALevelCreator::TILE_Y_LENGTH = 100.0f;
+const float ALevelCreator::TILE_Z_LENGTH = 100.0f;
+
+const int32 ALevelCreator::MAP_WIDTH = _MAP_WIDTH_;
+const int32 ALevelCreator::MAP_HEIGHT = _MAP_HEIGHT_;
 // Sets default values
 ALevelCreator::ALevelCreator()
 {
@@ -32,15 +38,15 @@ void ALevelCreator::ResetLevel()
 
 	/** Creating the initial indestructible blocks that will be there everywhere
 	*/
-	for (int32 y = 0; y < 13; ++y)
+	for (int32 y = 0; y < MAP_HEIGHT; ++y)
 	{
-		for (int32 x = 0; x < 13; ++x)
+		for (int32 x = 0; x < MAP_WIDTH; ++x)
 		{
 			if (MapData[y][x] == 1)
 			{
 				// Offset location by LevelCreator location so that level is always made around LevelCreator location
 				// instead of being made 
-				FVector location(x * 100 + 50 - 650, y * 100 + 50 - 650, 50);
+				FVector location(x * TILE_X_LENGTH + TILE_X_LENGTH / 2.0f - TILE_X_LENGTH * MAP_WIDTH / 2.0f, y * TILE_Y_LENGTH + TILE_Y_LENGTH / 2.0f - TILE_Y_LENGTH * MAP_HEIGHT / 2.0f, TILE_Z_LENGTH/2.0f);
 				location = location + GetActorLocation();
 
 				ABaseBlock* block = GetIndestructibleBlock();

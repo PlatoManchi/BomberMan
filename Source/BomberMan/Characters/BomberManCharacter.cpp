@@ -2,6 +2,7 @@
 
 #include "BomberManCharacter.h"
 #include "Gameplay/Bomb.h"
+#include "Weapon/BombPlacerComponent.h"
 
 // Engine includes
 #include "HeadMountedDisplayFunctionLibrary.h"
@@ -33,13 +34,10 @@ ABomberManCharacter::ABomberManCharacter()
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
-	// set default controller class to our Blueprinted controller
-	static ConstructorHelpers::FClassFinder<AActor> BombTypeBPClass(TEXT("/Game/Blueprints/Gameplay/BP_Bomb"));
-	if (BombTypeBPClass.Class != NULL)
-	{
-		BombTypeClass = BombTypeBPClass.Class;
-	}
-
+	// Creating bomb placer
+	BombPlacer = CreateDefaultSubobject<UBombPlacerComponent>(TEXT("BombPlacer"));
+	BombPlacer->SetupAttachment(RootComponent);
+	BombPlacer->SetOwningCharacter(this);
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
@@ -107,10 +105,8 @@ void ABomberManCharacter::MoveRight(float Value)
 
 void ABomberManCharacter::PlaceBomb()
 {
-	if (BombTypeClass)
+	if (BombPlacer)
 	{
-		FVector location = GetActorLocation();
-		location.Z = 50.0f;
-		GetWorld()->SpawnActor<ABomb>(BombTypeClass, location, FRotator::ZeroRotator);
+		BombPlacer->PlaceBomb();
 	}
 }

@@ -9,6 +9,7 @@
 // Forward decelerations
 class ABomberManController;
 class ABomb;
+class UBombPlacerComponent;
 
 UCLASS(config=Game)
 class ABomberManCharacter : public ACharacter
@@ -43,13 +44,16 @@ protected:
 	*/
 	void PlaceBomb();
 
+	/** Set the visuals for player based on the ID
+	*	@param id Id of player.
+	*/
 	UFUNCTION(BlueprintImplementableEvent, Category = "BomberManCharacter")
 	void SetPlayerID(int32 id);
 
 private:
-	/** Type of bomb this character can place.
+	/** Bomb placer that acts like gun and is responsible to place the bombs
 	*/
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "BomberManCharacter|Weapon", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<ABomb> BombTypeClass;
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
+	UBombPlacerComponent* BombPlacer;
 };
 
