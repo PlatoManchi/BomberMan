@@ -9,6 +9,7 @@
 // Forward decelerations
 class UBombPlacerComponent;
 class UBoxComponent;
+class USceneComponent;
 class ABomberManCharacter;
 
 UCLASS()
@@ -42,32 +43,21 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Bomb")
 	void SetOwningCharacter(ABomberManCharacter* NewOwningCharacter);
 
-	/** Call back when ever the collider begin overlap with any object.
-	*	@param OverlappedComp  Pointer to PrimitiveComponent in this actor that overlapped with something in scene.
-	*	@param OtherActor  Pointer to the actor that the OvelappedComp overlapped with in scene.
-	*	@param OtherComp  Pointer to the PrimitiveComponent in OtherActor that overlapped with this collider.
-	*	@param OtherBodyIndex  Index of the component that is overlapped in the OtherActor.
-	*	@param FromSweep  Is the overlap happed due to sweep rotation or position change or not.
-	*	@param SweepResult  If the overlapping even is due to sweep, then this will hold the sweep result for that event.
-	*/
-	UFUNCTION()
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	/**
-	*/
-	UFUNCTION()
-	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
 	/** Particle to play when explosion happens
 	*/
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	UParticleSystem* ExplosionParticleTemplate;
-
-	/** Collider that will take care of collisions.
-	*/
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
-		UBoxComponent* BoxCollider;
+	
 private:
+	/** Check for all the actors in the explosion area and damage them
+	*/
+	void DealDamage();
+
+	/** Do a multipline line trace and return the location
+	*	@return returns the location of the line trace
+	*/
+	FVector GetLineTraceLocation(FVector Start, FVector End);
+
 	/** Number of blocks around the bomb that bomb can effect.
 	*/
 	int32 ExplosionLength;
@@ -80,8 +70,31 @@ private:
 	*/
 	float TimeElapsed;
 
+	/** Distances in all directions
+	*/
+	float leftDistance, rightDistance, upDistance, downDistance;
 	/** The character that owns the component.
 	*/
 	UPROPERTY(BlueprintReadOnly, Category = "Bomb", meta = (AllowPrivateAccess = "true"))
 	ABomberManCharacter* OwningCharacter;
+
+	/** Collider that will take care of collisions.
+	*/
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+	UBoxComponent* BoxCollider;
+
+	/** Colliders damaging after explosion
+	*/
+	UPROPERTY(VisibleDefaultsOnly)
+	UBoxComponent* RightBoxCollider;
+
+	UPROPERTY(VisibleDefaultsOnly)
+	UBoxComponent* LeftBoxCollider;
+
+	UPROPERTY(VisibleDefaultsOnly)
+	UBoxComponent* UpBoxCollider;
+
+	UPROPERTY(VisibleDefaultsOnly)
+	UBoxComponent* DownBoxCollider;
+
 };
