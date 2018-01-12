@@ -86,15 +86,9 @@ private:
 	/** Colliders damaging after explosion
 	*/
 	UPROPERTY(VisibleDefaultsOnly)
-	UBoxComponent* RightBoxCollider;
+	UBoxComponent* HorizontalBoxCollider;
 
 	UPROPERTY(VisibleDefaultsOnly)
-	UBoxComponent* LeftBoxCollider;
-
-	UPROPERTY(VisibleDefaultsOnly)
-	UBoxComponent* UpBoxCollider;
-
-	UPROPERTY(VisibleDefaultsOnly)
-	UBoxComponent* DownBoxCollider;
+	UBoxComponent* VerticalBoxCollider;
 
 };

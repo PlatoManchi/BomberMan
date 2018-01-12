@@ -73,6 +73,13 @@ void ABomberManCharacter::PossessedBy(AController * NewController)
 	}
 }
 
+float ABomberManCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float actualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	return actualDamage;
+}
+
 
 void ABomberManCharacter::MoveForward(float Value)
 {

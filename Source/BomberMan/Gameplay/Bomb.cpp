@@ -29,25 +29,15 @@ ABomb::ABomb() :
 	USceneComponent* StraightColliders = CreateDefaultSubobject<USceneComponent>(TEXT("StraightColliders"));
 	StraightColliders->SetupAttachment(RootComponent);
 
-	RightBoxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("RightBoxCollider"));
-	RightBoxCollider->SetupAttachment(StraightColliders);
-	RightBoxCollider->bGenerateOverlapEvents = true;
-	RightBoxCollider->SetBoxExtent(FVector(0.0f, 0.0f, 0.0f));
+	HorizontalBoxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("HorizontalBoxCollider"));
+	HorizontalBoxCollider->SetupAttachment(StraightColliders);
+	HorizontalBoxCollider->bGenerateOverlapEvents = true;
+	HorizontalBoxCollider->SetBoxExtent(FVector(0.0f, 0.0f, 0.0f));
 
-	LeftBoxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("LeftBoxCollider"));
-	LeftBoxCollider->SetupAttachment(StraightColliders);
-	LeftBoxCollider->bGenerateOverlapEvents = true;
-	LeftBoxCollider->SetBoxExtent(FVector(0.0f, 0.0f, 0.0f));
-
-	UpBoxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("UpBoxCollider"));
-	UpBoxCollider->SetupAttachment(StraightColliders);
-	UpBoxCollider->bGenerateOverlapEvents = true;
-	UpBoxCollider->SetBoxExtent(FVector(0.0f, 0.0f, 0.0f));
-
-	DownBoxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("DownBoxCollider"));
-	DownBoxCollider->SetupAttachment(StraightColliders);
-	DownBoxCollider->bGenerateOverlapEvents = true;
-	DownBoxCollider->SetBoxExtent(FVector(0.0f, 0.0f, 0.0f));
+	VerticalBoxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("VerticalBoxCollider"));
+	VerticalBoxCollider->SetupAttachment(StraightColliders);
+	VerticalBoxCollider->bGenerateOverlapEvents = true;
+	VerticalBoxCollider->SetBoxExtent(FVector(0.0f, 0.0f, 0.0f));
 
 	// Set default controller class to our Blueprinted controller
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ExplosionParticleTemplateClass(TEXT("/Game/StarterContent/Particles/P_Explosion"));
@@ -69,7 +59,7 @@ void ABomb::BeginPlay()
 void ABomb::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 	TimeElapsed += DeltaTime;
 	if (TimeElapsed >= ExplosionDelay)
 	{
@@ -108,6 +98,8 @@ void ABomb::Explode()
 			{
 				transform.SetLocation(location + GetActorLocation());
 				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticleTemplate, transform, true);
+
+				//UGameplayStatics::ApplyRadialDamage(GetWorld(), 50.0f, transform.GetLocation(), 60.0f, UDamageType::StaticClass(), TArray<AActor*>(), this, OwningCharacter->Controller, true);
 			}
 			
 			// Up - Spawn particles
@@ -146,52 +138,35 @@ void ABomb::DealDamage()
 	float distanceX = traceEnd.X - traceStart.X;
 	rightDistance = FMath::Abs(distanceX);
 
-	RightBoxCollider->SetBoxExtent(FVector(distanceX / 2.0f, ALevelCreator::TILE_Y_LENGTH/2.0f, ALevelCreator::TILE_Z_LENGTH/2.0f));
-	RightBoxCollider->SetRelativeLocation(FVector(distanceX / 2.0f, 0.0f, 0.0f));
-
-	// Get all actors overlapping with right collider
-	RightBoxCollider->GetOverlappingActors(tmpActors, AActor::StaticClass());
-	for (AActor* actor : tmpActors)
-	{
-		AllOverlappingActors.AddUnique(actor);
-	}
-	tmpActors.Empty(false);
-
-	// left - Increase the collider and get overlapping actors in the area
+	// Left - Increase the collider and get overlapping actors in the area
 	traceEnd = traceStart + FVector(-1.0f, 0.0f, 0.0f) * ALevelCreator::TILE_X_LENGTH * ExplosionLength;
 	traceEnd = GetLineTraceLocation(traceStart, traceEnd);
 
 	distanceX = traceEnd.X - traceStart.X;
 	leftDistance = FMath::Abs(distanceX);
 
-	LeftBoxCollider->SetBoxExtent(FVector(distanceX / 2.0f, ALevelCreator::TILE_Y_LENGTH/2.0f, ALevelCreator::TILE_Z_LENGTH/2.0f));
-	LeftBoxCollider->SetRelativeLocation(FVector(distanceX / 2.0f, 0.0f, 0.0f));
+	distanceX = rightDistance + leftDistance;
+	float x = (rightDistance - leftDistance) / 2.0f;
+	
+	// Resize the horizontal collider to fit the size of collision
+	HorizontalBoxCollider->SetBoxExtent(FVector(distanceX / 2.0f, ALevelCreator::TILE_Y_LENGTH / 2.0f, ALevelCreator::TILE_Z_LENGTH / 2.0f));
+	HorizontalBoxCollider->SetRelativeLocation(FVector(x , 0.0f, 0.0f));
 
-	// Get all actors overlapping with left collider
-	LeftBoxCollider->GetOverlappingActors(tmpActors, AActor::StaticClass());
+	// Get all actors overlapping with right collider
+	HorizontalBoxCollider->GetOverlappingActors(tmpActors, AActor::StaticClass());
 	for (AActor* actor : tmpActors)
 	{
 		AllOverlappingActors.AddUnique(actor);
 	}
-	tmpActors.Empty(false);
+	tmpActors.Empty();
 
-	//UP - Increase the collider and get overlapping actors in the area
+	
+	// UP - Increase the collider and get overlapping actors in the area
 	traceEnd = traceStart + FVector(0.0f, -1.0f, 0.0f) * ALevelCreator::TILE_Y_LENGTH * ExplosionLength;
 	traceEnd = GetLineTraceLocation(traceStart, traceEnd);
 
 	float distanceY = traceEnd.Y - traceStart.Y;
 	upDistance = FMath::Abs(distanceY);
-
-	UpBoxCollider->SetBoxExtent(FVector(ALevelCreator::TILE_X_LENGTH / 2.0f, -distanceY / 2.0f, ALevelCreator::TILE_Z_LENGTH / 2.0f));
-	UpBoxCollider->SetRelativeLocation(FVector(0.0f, distanceY / 2.0f, 0.0f));
-
-	// Get all actors overlapping with up collider
-	UpBoxCollider->GetOverlappingActors(tmpActors, AActor::StaticClass());
-	for (AActor* actor : tmpActors)
-	{
-		AllOverlappingActors.AddUnique(actor);
-	}
-	tmpActors.Empty(false);
 
 	// Down - Increase the collider and get overlapping actors in the area
 	traceEnd = traceStart + FVector(0.0f, 1.0f, 0.0f) * ALevelCreator::TILE_Y_LENGTH * ExplosionLength;
@@ -200,21 +175,27 @@ void ABomb::DealDamage()
 	distanceY = traceEnd.Y - traceStart.Y;
 	downDistance = FMath::Abs(distanceY);
 
-	DownBoxCollider->SetBoxExtent(FVector(ALevelCreator::TILE_X_LENGTH / 2.0f, -distanceY / 2.0f, ALevelCreator::TILE_Z_LENGTH / 2.0f));
-	DownBoxCollider->SetRelativeLocation(FVector(0.0f, distanceY / 2.0f, 0.0f));
+	distanceY = upDistance + downDistance;
+	float y = (downDistance - upDistance) / 2.0f;
 
-	// Get all actors overlapping with down collider
-	DownBoxCollider->GetOverlappingActors(tmpActors, AActor::StaticClass());
+	// Resize vertical collider to fit the size of collision
+	VerticalBoxCollider->SetBoxExtent(FVector(ALevelCreator::TILE_X_LENGTH / 2.0f, distanceY / 2.0f, ALevelCreator::TILE_Z_LENGTH / 2.0f));
+	VerticalBoxCollider->SetRelativeLocation(FVector(0.0f, y, 0.0f));
+
+	// Get all actors overlapping with up collider
+	VerticalBoxCollider->GetOverlappingActors(tmpActors, AActor::StaticClass());
 	for (AActor* actor : tmpActors)
 	{
 		AllOverlappingActors.AddUnique(actor);
 	}
-	tmpActors.Empty(false);
+	tmpActors.Empty();
+
 
 	// Deal damage to all overlapping actors
 	for (AActor* actor : AllOverlappingActors)
 	{
-		actor->TakeDamage(50.0f, FDamageEvent(), OwningCharacter->Controller, this);
+		//UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *actor->GetName());
+		UGameplayStatics::ApplyDamage(actor, 50.0f, OwningCharacter->Controller, this, UDamageType::StaticClass());
 	}
 }
 

@@ -14,7 +14,12 @@ class BOMBERMAN_API ABomberManPlayerState : public APlayerState
 {
 	GENERATED_BODY()
 	
-	
-	
-	
+public:
+	/** Holds Player's current health
+	*/
+	float PlayerHealth;
+
+	/** Holds Player's max health
+	*/
+	float MaxPlayerHealth;
 };

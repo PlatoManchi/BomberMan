@@ -30,6 +30,10 @@ protected:
 	*/
 	virtual void PossessedBy(AController* NewController) override;
 
+	/** Take damage event.
+	*/
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+
 	/** Called for forwards/backward input 
 	*	@param Value The value representing input in vertical axis
 	*/
