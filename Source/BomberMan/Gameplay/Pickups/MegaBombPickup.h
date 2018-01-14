@@ -15,17 +15,18 @@ class BOMBERMAN_API AMegaBombPickup : public ABasePickup
 	GENERATED_BODY()
 	
 public:
-	/** Default ocnstructor
+	/** Default constructor
 	*/
 	AMegaBombPickup();
+protected:
 
+	/** Called when this pick up is picked by player.
+	*/
+	virtual void PickedUpBy(ABomberManCharacter* Character) override;
+	
+private:
 	/** Number of extra tiles to add to explosion
 	*/
 	UPROPERTY(EditDefaultsOnly, Category = "Pickup|MegaBombPickup")
-	int32 IncrementCount;
-
-protected:
-
-	virtual void PickedUpBy(ABomberManCharacter* Character) override;
-	
+	int32 IncrementAmount;
 };

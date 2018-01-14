@@ -5,7 +5,7 @@
 #include "Characters/Weapon/BombPlacerComponent.h"
 
 AMegaBombPickup::AMegaBombPickup() :
-	IncrementCount(2.0f)
+	IncrementAmount(2.0f)
 {
 
 }
@@ -17,7 +17,7 @@ void AMegaBombPickup::PickedUpBy(ABomberManCharacter* Character)
 	// Increment the explosion length
 	if (bombplacerComponent)
 	{
-		bombplacerComponent->SetExplosionLength(bombplacerComponent->GetExplosionLength() + IncrementCount);
+		bombplacerComponent->SetExplosionLength(bombplacerComponent->GetExplosionLength() + IncrementAmount);
 	}
 
 	Super::PickedUpBy(Character);
