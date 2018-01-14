@@ -2,6 +2,7 @@
 
 #include "BomberManPlayerState.h"
 
+ABomberManPlayerState::ABomberManPlayerState()
+{
 
-
-
+}

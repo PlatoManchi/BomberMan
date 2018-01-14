@@ -15,6 +15,10 @@ class BOMBERMAN_API ABomberManPlayerState : public APlayerState
 	GENERATED_BODY()
 	
 public:
+	/** Default constructor
+	*/
+	ABomberManPlayerState();
+
 	/** Holds Player's current health
 	*/
 	float PlayerHealth;
@@ -22,4 +26,12 @@ public:
 	/** Holds Player's max health
 	*/
 	float MaxPlayerHealth;
+
+	/** How many bombs currently available that player can place on map
+	*/
+	int32 CurrentBombsAvailable;
+
+	/** Max bombs that player is allowed to place on map at once.
+	*/
+	int32 MaxBombsAvailable;
 };
