@@ -34,4 +34,8 @@ public:
 	/** Max bombs that player is allowed to place on map at once.
 	*/
 	int32 MaxBombsAvailable;
+
+	/** True if player took speed boost and speed is boosted
+	*/
+	bool IsSpeedBoost;
 };
