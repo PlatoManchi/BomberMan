@@ -7,10 +7,15 @@
 #include "Bomb.generated.h"
 
 // Forward decelerations
+class ABomberManCharacter;
+class ABomb;
 class UBombPlacerComponent;
 class UBoxComponent;
 class USceneComponent;
 class ABomberManCharacter;
+
+// Delegate decelerations
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBombExploded, ABomb*, Bomb);
 
 UCLASS()
 class BOMBERMAN_API ABomb : public AActor
@@ -24,6 +29,10 @@ public:
 	// Sets default values for this actor's properties
 	ABomb();
 
+	/** Event fires when bomb explodes
+	*/
+	UPROPERTY(BlueprintAssignable, Category = "Bomb")
+	FBombExploded OnBombExploded;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -36,6 +45,10 @@ protected:
 	/** Called to explode the bomb
 	*/
 	virtual void Explode();
+
+	/** Take damage event.
+	*/
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 
 	/** Set the owner of this component. This is just a function to cache the character.
 	*	@param NewOwningCharacter The character that this component is attached to.
@@ -53,7 +66,15 @@ private:
 	*/
 	void DealDamage();
 
-	/** Do a multipline line trace and return the location
+	/** If true then this bomb is exploding so as to avoid infinite nested explosion.
+		If Explode is called then it will deal damage to adjacent bomb which will explode and damage this bomb, and this bomb
+		will again explode and damage same adjacent bomb causing infinite loop.
+
+		To avoid this nested infinite calls, if bomb exploded, if true then dont process any damage or explosion requestss.
+	*/
+	bool IsExploding;
+
+	/** Do a multi line trace and return the location
 	*	@return returns the location of the line trace
 	*/
 	FVector GetLineTraceLocation(FVector Start, FVector End);
@@ -73,7 +94,8 @@ private:
 	/** Distances in all directions
 	*/
 	float leftDistance, rightDistance, upDistance, downDistance;
-	/** The character that owns the component.
+
+	/** The character that places this bomb on map.
 	*/
 	UPROPERTY(BlueprintReadOnly, Category = "Bomb", meta = (AllowPrivateAccess = "true"))
 	ABomberManCharacter* OwningCharacter;

@@ -1,6 +1,7 @@
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 
 #include "BomberManCharacter.h"
+#include "BomberManPlayerState.h"
 #include "Gameplay/Bomb.h"
 #include "Weapon/BombPlacerComponent.h"
 
@@ -116,4 +117,7 @@ void ABomberManCharacter::PlaceBomb()
 	{
 		BombPlacer->PlaceBomb();
 	}
+}
+void ABomberManCharacter::OnBombExploded(ABomb* Bomb)
+{
 }

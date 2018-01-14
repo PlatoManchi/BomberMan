@@ -15,7 +15,8 @@
 
 // Sets default values
 ABomb::ABomb() :
-	TimeElapsed(0.0f)
+	TimeElapsed(0.0f),
+	IsExploding(false)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -67,14 +68,28 @@ void ABomb::Tick(float DeltaTime)
 	}
 }
 
-void ABomb::SetOwningCharacter_Implementation(ABomberManCharacter * NewOwningCharacter)
+void ABomb::SetOwningCharacter_Implementation(ABomberManCharacter* NewOwningCharacter)
 {
 	OwningCharacter = NewOwningCharacter;
+	OnBombExploded.AddDynamic(OwningCharacter, &ABomberManCharacter::OnBombExploded);
 }
 
 void ABomb::Explode()
 {
+	if (IsExploding)
+	{
+		return;
+	}
+
+	IsExploding = true;
+
 	DealDamage();
+
+	// Fire event that this bomb is exploding
+	if (OnBombExploded.IsBound())
+	{
+		OnBombExploded.Broadcast(this);
+	}
 
 	// Visual and damage
 	if (ExplosionParticleTemplate)
@@ -121,6 +136,20 @@ void ABomb::Explode()
 
 	Destroy();
 }
+
+float ABomb::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float actualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	// Explode the bomb
+	if (!IsExploding)
+	{
+		Explode();
+	}
+	
+	return actualDamage;
+}
+
 
 void ABomb::DealDamage()
 {
@@ -190,15 +219,13 @@ void ABomb::DealDamage()
 	VerticalBoxCollider->GetOverlappingActors(tmpActors, AActor::StaticClass());
 	for (AActor* actor : tmpActors)
 	{
-		AllOverlappingActors.AddUnique(actor);
+		AllOverlappingActors.AddUnique(actor);	
 	}
 	tmpActors.Empty();
 
-
-	// Deal damage to all overlapping actors
+	// Deal damage to all overlapping actors.
 	for (AActor* actor : AllOverlappingActors)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Overlapping with: %s"), *actor->GetName());
 		UGameplayStatics::ApplyDamage(actor, 50.0f, OwningCharacter->Controller, this, UDamageType::StaticClass());
 	}
 }
