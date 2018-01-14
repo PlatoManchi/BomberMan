@@ -27,6 +27,6 @@ protected:
 private:
 	/** Number of extra tiles to add to explosion
 	*/
-	UPROPERTY(EditDefaultsOnly, Category = "Pickup|MegaBombPickup")
+	UPROPERTY(EditDefaultsOnly, Category = "Pickup|MegaBombPickup", meta = (MinValue = 0))
 	int32 IncrementAmount;
 };

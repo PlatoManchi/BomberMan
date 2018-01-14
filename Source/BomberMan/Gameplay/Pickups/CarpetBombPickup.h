@@ -26,6 +26,8 @@ protected:
 
 private:
 
-	UPROPERTY(EditDefaultsOnly, Category = "Pickup|CarpedBombPickup")
+	/** Number of extra bombs that will be available for player.
+	*/
+	UPROPERTY(EditDefaultsOnly, Category = "Pickup|CarpedBombPickup", meta = (MinValue = 0))
 	int32 IncrementAmount;
 };

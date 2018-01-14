@@ -35,8 +35,12 @@ protected:
 	virtual void PossessedBy(AController* NewController) override;
 
 	/** Take damage event.
+	*	@param	DamageAmount How much damage to apply
+	*	@param	DamageEvent Data package that fully describes the damage received.
+	*	@param	EventInstigator The Controller responsible for the damage.
+	*	@param	DamageCauser The Actor that directly caused the damage (e.g. the projectile that exploded, the rock that landed on you)
 	*/
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	/** Called for forwards/backward input 
 	*	@param Value The value representing input in vertical axis

@@ -14,6 +14,7 @@ void ACarpetBombPickup::PickedUpBy(ABomberManCharacter* Character)
 {
 	ABomberManPlayerState* playerState = Cast<ABomberManPlayerState>(Character->GetController()->PlayerState);
 
+	// Increment the available bombs to player.
 	if (playerState)
 	{
 		playerState->MaxBombsAvailable += IncrementAmount;

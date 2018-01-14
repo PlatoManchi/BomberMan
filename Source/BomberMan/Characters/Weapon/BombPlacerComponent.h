@@ -36,6 +36,7 @@ public:
 	/** Returns the number of blocks the explosion will happen.
 	*/
 	FORCEINLINE int32 GetExplosionLength() const { return ExplosionLength; }
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
