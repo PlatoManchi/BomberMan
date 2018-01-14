@@ -47,10 +47,19 @@ protected:
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult);
 
+	/** Take damage event.
+	*	@param	DamageAmount How much damage to apply
+	*	@param	DamageEvent Data package that fully describes the damage received.
+	*	@param	EventInstigator The Controller responsible for the damage.
+	*	@param	DamageCauser The Actor that directly caused the damage (e.g. the projectile that exploded, the rock that landed on you)
+	*/
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 	/** Rate at which visual component should rotate. Angle per second
 	*/
 	UPROPERTY(EditDefaultsOnly, Category = "Pickup")
 	float VisualRotationRate;
+
 private:	
 	/** Angle for rotating the visual component
 	*/

@@ -57,3 +57,16 @@ void ABasePickup::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
 	}
 }
 
+float ABasePickup::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float actualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	// If pick up gets damaged, destroy it.
+	if (actualDamage > 0)
+	{
+		Destroy();
+	}
+
+	return actualDamage;
+}
+
