@@ -44,3 +44,27 @@ void ABomberManGameMode::BeginPlay()
 		UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(bombermanCamera);
 	}
 }
+
+APlayerController * ABomberManGameMode::Login(UPlayer * NewPlayer, ENetRole InRemoteRole, const FString & Portal, const FString & Options, const FUniqueNetIdRepl & UniqueId, FString & ErrorMessage)
+{
+	APlayerController* controller = Super::Login(NewPlayer, InRemoteRole, Portal, Options, UniqueId, ErrorMessage);
+
+	if (controller->IsValidLowLevel())
+	{
+		ABomberManPlayerState* playerState = Cast<ABomberManPlayerState>(controller->PlayerState);
+
+		// Initializing the player
+		if (playerState)
+		{
+			// Setting player health
+			playerState->PlayerHealth = 1.0f;
+			playerState->MaxPlayerHealth = 1.0f;
+
+			// Setting the bombs available
+			playerState->CurrentBombsAvailable = 1;
+			playerState->MaxBombsAvailable = 1;
+		}
+	}
+
+	return controller;
+}
