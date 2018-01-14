@@ -27,6 +27,15 @@ public:
 	/** If able to, place the bomb at character's location.
 	*/
 	void PlaceBomb();
+
+	/** Sets the explosion length.
+	*	@param NewExplosionLength New explosion length to set.
+	*/
+	void SetExplosionLength(int32 NewExplosionLength);
+
+	/** Returns the number of blocks the explosion will happen.
+	*/
+	FORCEINLINE int32 GetExplosionLength() const { return ExplosionLength; }
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

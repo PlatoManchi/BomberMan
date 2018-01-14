@@ -25,6 +25,9 @@ public:
 	*/
 	ABomberManCharacter();
 
+	/** Return the bomb placer component that this character uses.
+	*/
+	FORCEINLINE UBombPlacerComponent* GetBombPlacerComponent() const { return BombPlacer; }
 protected:
 	/** Called when this Pawn is possessed.
 	*	@param NewController The controller possessing this pawn

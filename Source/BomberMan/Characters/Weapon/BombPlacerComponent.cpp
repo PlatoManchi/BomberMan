@@ -67,12 +67,18 @@ void UBombPlacerComponent::PlaceBomb()
 
 			FVector location = OwningCharacter->GetActorLocation();
 			location.Z = ALevelCreator::TILE_Z_LENGTH / 2.0f;
+
 			ABomb* bomb = GetWorld()->SpawnActor<ABomb>(BombTypeClass, location, FRotator::ZeroRotator);
 			bomb->SetOwningCharacter(OwningCharacter);
 			bomb->ExplosionLength = ExplosionLength;
 			bomb->ExplosionDelay = ExplosionDelay;
 		}
 	}
+}
+
+void UBombPlacerComponent::SetExplosionLength(int32 NewExplosionLength)
+{
+	ExplosionLength = NewExplosionLength;
 }
 
 // Called when the game starts
