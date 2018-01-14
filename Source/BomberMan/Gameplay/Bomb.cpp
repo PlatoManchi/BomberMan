@@ -16,7 +16,8 @@
 // Sets default values
 ABomb::ABomb() :
 	TimeElapsed(0.0f),
-	IsExploding(false)
+	IsExploding(false),
+	PlayerCountOverlappingBomb(0)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -53,7 +54,8 @@ void ABomb::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	
+	BoxCollider->OnComponentBeginOverlap.AddDynamic(this, &ABomb::OnOverlapBegin);
+	BoxCollider->OnComponentEndOverlap.AddDynamic(this, &ABomb::OnOverlapEnd);
 }
 
 // Called every frame
@@ -148,6 +150,29 @@ float ABomb::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 	}
 	
 	return actualDamage;
+}
+
+void ABomb::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult)
+{
+	ABomberManCharacter* character = Cast<ABomberManCharacter>(OtherActor);
+	if(character)
+	{
+		PlayerCountOverlappingBomb++;
+	}
+}
+
+void ABomb::OnOverlapEnd(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex)
+{
+	ABomberManCharacter* character = Cast<ABomberManCharacter>(OtherActor);
+	if (character)
+	{
+		PlayerCountOverlappingBomb--;
+	}
+
+	if (PlayerCountOverlappingBomb == 0)
+	{
+		BoxCollider->SetCollisionResponseToAllChannels(ECR_Block);
+	}
 }
 
 

@@ -50,6 +50,26 @@ protected:
 	*/
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 
+	/** Call back when ever the collider begin overlap with any object.
+	*	@param OverlappedComp  Pointer to PrimitiveComponent in this actor that overlapped with something in scene.
+	*	@param OtherActor  Pointer to the actor that the OvelappedComp overlapped with in scene.
+	*	@param OtherComp  Pointer to the PrimitiveComponent in OtherActor that overlapped with this collider.
+	*	@param OtherBodyIndex  Index of the component that is overlapped in the OtherActor.
+	*	@param FromSweep  Is the overlap happed due to sweep rotation or position change or not.
+	*	@param SweepResult  If the overlapping even is due to sweep, then this will hold the sweep result for that event.
+	*/
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult);
+
+	/** Call back when ever the collider end overlap with any object.
+	*	@param OverlappedComp  Pointer to PrimitiveComponent in this actor that end overlap with something in scene.
+	*	@param OtherActor  Pointer to the actor that the OvelappedComp end overlap with in scene.
+	*	@param OtherComp  Pointer to the PrimitiveComponent in OtherActor that end overlap with this collider.
+	*	@param OtherBodyIndex  Index of the component that is end overlap in the OtherActor.
+	*/
+	UFUNCTION()
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 	/** Set the owner of this component. This is just a function to cache the character.
 	*	@param NewOwningCharacter The character that this component is attached to.
 	*/
@@ -73,6 +93,11 @@ private:
 		To avoid this nested infinite calls, if bomb exploded, if true then dont process any damage or explosion requestss.
 	*/
 	bool IsExploding;
+	
+	/** If bomb is spawned on player then bomb will displace player or player can get stuck inside bomb.
+		To avoid this, spawn bomb with overlap if there are no players overlapping with bomb then make it block all
+	*/
+	int32 PlayerCountOverlappingBomb;
 
 	/** Do a multi line trace and return the location
 	*	@return returns the location of the line trace
