@@ -118,6 +118,20 @@ void ABomberManCharacter::PlaceBomb()
 		BombPlacer->PlaceBomb();
 	}
 }
+
 void ABomberManCharacter::OnBombExploded(ABomb* Bomb)
 {
+	ABomberManPlayerState* playerState = Cast<ABomberManPlayerState>(Controller->PlayerState);
+
+	if (playerState)
+	{
+		// Since bomb exploded increment the available bombs
+		playerState->CurrentBombsAvailable++;
+
+		// Clamp the available bombs to max bombs.
+		if (playerState->CurrentBombsAvailable > playerState->MaxBombsAvailable)
+		{
+			playerState->CurrentBombsAvailable = playerState->MaxBombsAvailable;
+		}
+	}
 }

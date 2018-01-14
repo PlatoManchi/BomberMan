@@ -18,6 +18,7 @@ class ABomberManCharacter : public ACharacter
 
 	// Giving full access of character to controller.
 	friend class ABomberManController;
+	friend class ABomb;
 
 public:
 	/** Default constructor
@@ -54,6 +55,10 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = "BomberManCharacter")
 	void SetPlayerID(int32 id);
 
+	/** Event fired when bomb that this character placed explodes
+	*/
+	UFUNCTION()
+	void OnBombExploded(ABomb* Bomb);
 private:
 	/** Bomb placer that acts like gun and is responsible to place the bombs
 	*/
