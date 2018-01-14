@@ -57,12 +57,12 @@ APlayerController * ABomberManGameMode::Login(UPlayer * NewPlayer, ENetRole InRe
 		if (playerState)
 		{
 			// Setting player health
-			playerState->PlayerHealth = 1.0f;
 			playerState->MaxPlayerHealth = 1.0f;
-
+			playerState->PlayerHealth = playerState->MaxPlayerHealth;
+			
 			// Setting the bombs available
-			playerState->CurrentBombsAvailable = 1;
-			playerState->MaxBombsAvailable = 1;
+			playerState->MaxBombsAvailable = 10;
+			playerState->CurrentBombsAvailable = playerState->MaxBombsAvailable;
 		}
 	}
 
