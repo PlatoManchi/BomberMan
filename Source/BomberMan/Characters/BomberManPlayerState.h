@@ -19,6 +19,10 @@ public:
 	*/
 	ABomberManPlayerState();
 
+	/** ID of the player
+	*/
+	int32 PlayerID;
+
 	/** Holds Player's current health
 	*/
 	float PlayerHealth;

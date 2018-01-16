@@ -3,6 +3,7 @@
 #include "BomberManGameMode.h"
 #include "Camera/BomberManCamera.h"
 #include "Characters/BomberManPlayerState.h"
+#include "UI/InGameHUDWidget.h"
 
 // Engine includes
 #include "EngineUtils.h"
@@ -11,7 +12,8 @@
 
 
 
-ABomberManGameMode::ABomberManGameMode()
+ABomberManGameMode::ABomberManGameMode() :
+	InGameHUD(nullptr)
 {
 	// Set default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprints/Characters/BP_BomberManCharacter"));
@@ -29,6 +31,15 @@ ABomberManGameMode::ABomberManGameMode()
 
 	// Set default player state class
 	PlayerStateClass = ABomberManPlayerState::StaticClass();
+
+	// Set default controller class to our Blueprinted controller
+	static ConstructorHelpers::FClassFinder<UUserWidget> InGameHUDBPClass(TEXT("/Game/Blueprints/UI/InGameHUD/WBP_InGameHUDWidget"));
+	if (InGameHUDBPClass.Class != NULL)
+	{
+		InGameHUDClass = InGameHUDBPClass.Class;
+	}
+	
+	InGameHUD = CreateWidget<UInGameHUDWidget>(GetWorld(), InGameHUDClass);
 }
 
 void ABomberManGameMode::BeginPlay()
@@ -43,6 +54,8 @@ void ABomberManGameMode::BeginPlay()
 		ABomberManCamera* bombermanCamera = *itr;
 		UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(bombermanCamera);
 	}
+
+	InGameHUD->AddToViewport();
 }
 
 APlayerController * ABomberManGameMode::Login(UPlayer * NewPlayer, ENetRole InRemoteRole, const FString & Portal, const FString & Options, const FUniqueNetIdRepl & UniqueId, FString & ErrorMessage)
@@ -61,7 +74,7 @@ APlayerController * ABomberManGameMode::Login(UPlayer * NewPlayer, ENetRole InRe
 			playerState->PlayerHealth = playerState->MaxPlayerHealth;
 			
 			// Setting the bombs available
-			playerState->MaxBombsAvailable = 10;
+			playerState->MaxBombsAvailable = 1;
 			playerState->CurrentBombsAvailable = playerState->MaxBombsAvailable;
 
 			// Speed boost
@@ -70,4 +83,30 @@ APlayerController * ABomberManGameMode::Login(UPlayer * NewPlayer, ENetRole InRe
 	}
 
 	return controller;
+}
+
+void ABomberManGameMode::PostLogin(APlayerController* NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+
+	if (NewPlayer && InGameHUD)
+	{
+		ABomberManPlayerState* playerState = Cast<ABomberManPlayerState>(NewPlayer->PlayerState);
+
+		// Initializing the player
+		if (playerState)
+		{
+			playerState->PlayerID = UGameplayStatics::GetPlayerControllerID(NewPlayer);
+			UE_LOG(LogTemp, Warning, TEXT("Player ID: %d"), playerState->PlayerID);
+			if (playerState->PlayerID == 0)
+			{
+				InGameHUD->SetPlayer1State(playerState);
+			}
+
+			if (playerState->PlayerID == 1)
+			{
+				InGameHUD->SetPlayer2State(playerState);
+			}
+		}
+	}
 }
