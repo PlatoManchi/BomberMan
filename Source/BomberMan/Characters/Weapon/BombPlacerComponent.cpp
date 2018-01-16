@@ -42,36 +42,22 @@ void UBombPlacerComponent::PlaceBomb()
 		// Check if player can place bombs
 		if (playerState && playerState->CurrentBombsAvailable > 0)
 		{
+			// If character is already overlapping with a bomb don't place another bomb.
+			// This is to avoid multiple bombs in same place
+			if (IsOverlappingWithBomb())
+				return;
+
 			// Decrementing the available bombs
 			playerState->CurrentBombsAvailable--;
 
-			TArray<AActor*> OverlappingActors;
-			OwningCharacter->GetCapsuleComponent()->GetOverlappingActors(OverlappingActors);
-
-			bool isOverlappingWithBomb = false;
-
-			for (AActor* actor : OverlappingActors)
-			{
-				ABomb* bomb = Cast<ABomb>(actor);;
-				if (bomb)
-				{
-					isOverlappingWithBomb = true;
-					break;
-				}
-			}
-
-			// If character is already overlapping with a bomb don't place another bomb.
-			// This is to avoid multiple bombs in same place
-			if (isOverlappingWithBomb)
-				return;
-
+			// Place bomb at actor location
 			FVector location = OwningCharacter->GetActorLocation();
 			location.Z = ALevelCreator::TILE_Z_LENGTH / 2.0f;
 
 			ABomb* bomb = GetWorld()->SpawnActor<ABomb>(BombTypeClass, location, FRotator::ZeroRotator);
 			bomb->SetOwningCharacter(OwningCharacter);
-			bomb->ExplosionLength = ExplosionLength;
-			bomb->ExplosionDelay = ExplosionDelay;
+			bomb->SetExplosionLength(ExplosionLength);
+			bomb->SetExplosionDelay(ExplosionDelay);
 		}
 	}
 }
@@ -81,21 +67,31 @@ void UBombPlacerComponent::SetExplosionLength(int32 NewExplosionLength)
 	ExplosionLength = NewExplosionLength;
 }
 
-// Called when the game starts
-void UBombPlacerComponent::BeginPlay()
+void UBombPlacerComponent::SetExplosionDelay(float NewExplosionDelay)
 {
-	Super::BeginPlay();
-
-	// ...
-	
+	ExplosionDelay = NewExplosionDelay;
 }
 
 
-// Called every frame
-void UBombPlacerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+bool UBombPlacerComponent::IsOverlappingWithBomb() const
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	// Get all actors that are overlapping with character
+	TArray<AActor*> OverlappingActors;
+	OwningCharacter->GetCapsuleComponent()->GetOverlappingActors(OverlappingActors);
 
-	// ...
+	bool isOverlappingWithBomb = false;
+
+	// Loop and see if any bomb is overlapping with character.
+	for (AActor* actor : OverlappingActors)
+	{
+		ABomb* bomb = Cast<ABomb>(actor);;
+		if (bomb)
+		{
+			isOverlappingWithBomb = true;
+			break;
+		}
+	}
+
+	return isOverlappingWithBomb;
 }
 

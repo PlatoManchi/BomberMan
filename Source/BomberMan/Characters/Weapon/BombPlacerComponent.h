@@ -10,6 +10,8 @@
 class ABomb;
 class ABomberManCharacter;
 
+/** This is like the gun. It will be responsible for placing bombs (like firing bullets).
+*/
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BOMBERMAN_API UBombPlacerComponent : public USceneComponent
 {
@@ -26,25 +28,30 @@ public:
 
 	/** If able to, place the bomb at character's location.
 	*/
-	void PlaceBomb();
+	virtual void PlaceBomb();
 
 	/** Sets the explosion length.
 	*	@param NewExplosionLength New explosion length to set.
 	*/
 	void SetExplosionLength(int32 NewExplosionLength);
 
+	/** Set the explosion delay.
+	*	@param NewExplosionDelay New explosion delay to set.
+	*/
+	void SetExplosionDelay(float NewExplosionDelay);
+
 	/** Returns the number of blocks the explosion will happen.
 	*/
 	FORCEINLINE int32 GetExplosionLength() const { return ExplosionLength; }
 
+	/** Returns the delay for each bomb.
+	*/
+	FORCEINLINE float GetExplosionDelay() const { return ExplosionDelay; }
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+	/** Returns true if Owning character is 
+	*/
+	bool IsOverlappingWithBomb() const;
 
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-private:
 	/** The character that owns the component.
 	*/
 	ABomberManCharacter* OwningCharacter;
@@ -63,4 +70,5 @@ private:
 	*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ABomb> BombTypeClass;
+
 };
