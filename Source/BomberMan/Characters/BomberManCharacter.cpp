@@ -44,6 +44,24 @@ ABomberManCharacter::ABomberManCharacter()
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
 
+UBombPlacerComponent* ABomberManCharacter::SetBombPlacerClass(TSubclassOf<UBombPlacerComponent> NewBombPlacer)
+{
+	int32 ExplosionLength = BombPlacer->GetExplosionLength();
+	
+	// Destroy previous bomb placer
+	BombPlacer->DestroyComponent();
+
+	// Create the new bomb placer type
+	BombPlacer = NewObject<UBombPlacerComponent>(this, NewBombPlacer);
+	BombPlacer->RegisterComponent();
+	BombPlacer->SetOwningCharacter(this);
+
+	// Setting the values.
+	BombPlacer->SetExplosionLength(ExplosionLength);
+
+	return BombPlacer;
+}
+
 void ABomberManCharacter::PossessedBy(AController * NewController)
 {
 	// Set character color based on the controller id.

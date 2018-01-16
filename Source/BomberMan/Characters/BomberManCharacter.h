@@ -25,6 +25,11 @@ public:
 	*/
 	ABomberManCharacter();
 
+	/** Change the bomb placer component.
+	*	@param NewBombPlacer Class of new bomb placer.
+	*/
+	UBombPlacerComponent* SetBombPlacerClass(TSubclassOf<UBombPlacerComponent> NewBombPlacer);
+
 	/** Return the bomb placer component that this character uses.
 	*/
 	FORCEINLINE UBombPlacerComponent* GetBombPlacerComponent() const { return BombPlacer; }
