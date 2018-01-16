@@ -19,5 +19,11 @@ void ARemoteBombPickup::PickedUpBy(ABomberManCharacter* Character)
 	{
 		remoteBombPlacer->SetMaxPowerupTime(MaxPowerupTime);
 	}
+
+	if (Character->OnRemoteBombPickup.IsBound())
+	{
+		Character->OnRemoteBombPickup.Broadcast(MaxPowerupTime);
+	}
+
 	Super::PickedUpBy(Character);
 }

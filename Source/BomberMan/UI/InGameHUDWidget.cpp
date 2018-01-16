@@ -2,6 +2,7 @@
 
 #include "InGameHUDWidget.h"
 #include "Characters/BomberManPlayerState.h"
+#include "Characters/BomberManCharacter.h"
 
 void UInGameHUDWidget::NativeTick(const FGeometry & MyGeometry, float InDeltaTime)
 {
@@ -30,28 +31,86 @@ void UInGameHUDWidget::NativeTick(const FGeometry & MyGeometry, float InDeltaTim
 		SetPlayer2CurrentBombs(Player2State->CurrentBombsAvailable);
 		PrevPlayer2CurrentBombs = Player2State->CurrentBombsAvailable;
 	}
+
+	// Remote bombs
+	if (IsPlayer1RemoteBomb)
+	{
+		Player1RemoteBombTimeElapsed += InDeltaTime;
+		if (Player1RemoteBombTimeElapsed > Player1RemoteBombMaxTime)
+		{
+			Player1RemoteBombHide();
+		}
+	}
+
+	if (IsPlayer2RemoteBomb)
+	{
+		Player2RemoteBombTimeElapsed += InDeltaTime;
+		if (Player2RemoteBombTimeElapsed > Player2RemoteBombMaxTime)
+		{
+			Player2RemoteBombHide();
+		}
+	}
 }
 
 
-void UInGameHUDWidget::SetPlayer1State(ABomberManPlayerState* PlayerState)
+void UInGameHUDWidget::SetPlayer1(ABomberManCharacter* Player)
 {
+	ABomberManPlayerState* PlayerState = Cast<ABomberManPlayerState>(Player->GetController()->PlayerState);
+
 	Player1State = PlayerState;
+	IsPlayer1RemoteBomb = false;
 
 	SetPlayer1MaxBombs(Player1State->MaxBombsAvailable);
 	SetPlayer1CurrentBombs(Player1State->CurrentBombsAvailable);
 
 	PrevPlayer1MaxBombs = Player1State->MaxBombsAvailable;
 	PrevPlayer1CurrentBombs = Player1State->CurrentBombsAvailable;
+
+	Player->OnRemoteBombPickup.AddDynamic(this, &UInGameHUDWidget::Player1RemoteBomb);
 }
 
-void UInGameHUDWidget::SetPlayer2State(ABomberManPlayerState* PlayerState)
+void UInGameHUDWidget::SetPlayer2(ABomberManCharacter* Player)
 {
+	ABomberManPlayerState* PlayerState = Cast<ABomberManPlayerState>(Player->GetController()->PlayerState);
+
 	Player2State = PlayerState;
+	IsPlayer2RemoteBomb = false;
 
 	SetPlayer2MaxBombs(Player2State->MaxBombsAvailable);
 	SetPlayer2CurrentBombs(Player2State->CurrentBombsAvailable);
 
 	PrevPlayer2MaxBombs = Player2State->MaxBombsAvailable;
 	PrevPlayer2CurrentBombs = Player2State->CurrentBombsAvailable;
+
+	Player->OnRemoteBombPickup.AddDynamic(this, &UInGameHUDWidget::Player2RemoteBomb);
 }
 
+void UInGameHUDWidget::Player1RemoteBomb_Implementation(float MaxTime)
+{
+	Player1RemoteBombMaxTime = MaxTime;
+	Player1RemoteBombTimeElapsed = 0;
+	IsPlayer1RemoteBomb = true;
+}
+
+void UInGameHUDWidget::Player2RemoteBomb_Implementation(float MaxTime)
+{
+	Player2RemoteBombMaxTime = MaxTime;
+	Player2RemoteBombTimeElapsed = 0;
+	IsPlayer2RemoteBomb = true;
+}
+
+void UInGameHUDWidget::Player1RemoteBombHide_Implementation()
+{
+	IsPlayer1RemoteBomb = false;
+}
+
+void UInGameHUDWidget::Player2RemoteBombHide_Implementation()
+{
+	IsPlayer2RemoteBomb = false;
+}
+
+void UInGameHUDWidget::Reset_Implementation()
+{
+	IsPlayer1RemoteBomb = false;
+	IsPlayer2RemoteBomb = false;
+}

@@ -87,7 +87,7 @@ void ABomberManCamera::ManageCameraZoom(float DeltaTime)
 	// Add some extra distance so that there is always some view ahead of characters instead of characters
 	// being on the edge of screen
 	maxDistance += 400.0f;
-	maxDistance = FMath::Clamp(maxDistance, 600.0f, 2500.0f);
+	maxDistance = FMath::Clamp(maxDistance, 600.0f, 1500.0f);
 	float newTargetArmLength = FMath::FInterpTo(SpringArmComponent->TargetArmLength, maxDistance, DeltaTime, 1.0f);
 
 	SpringArmComponent->TargetArmLength = newTargetArmLength;

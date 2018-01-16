@@ -96,6 +96,15 @@ float ABomberManCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Da
 {
 	float actualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+	GetMesh()->SetSimulatePhysics(true);
+	FVector direction = GetActorLocation() - DamageCauser->GetActorLocation();
+	float distance = direction.Size();
+	direction = direction / distance;
+
+	float force = FMath::Lerp(80000, 35000, distance / 500.0f);
+
+	GetMesh()->AddImpulse(direction * force);
+
 	return actualDamage;
 }
 

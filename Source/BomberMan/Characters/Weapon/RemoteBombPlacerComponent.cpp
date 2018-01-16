@@ -70,6 +70,13 @@ void URemoteBombPlacerComponent::TickComponent(float DeltaTime, ELevelTick TickT
 	// When time is up change back to normal bomb placer class
 	if (TimeElapsed > MaxPowerupTime)
 	{
+		// If there bomb then explode it
+		if (Bomb)
+		{
+			Bomb->Explode();
+			Bomb = nullptr;
+		}
+
 		OwningCharacter->SetBombPlacerClass(UBombPlacerComponent::StaticClass());
 	}
 }

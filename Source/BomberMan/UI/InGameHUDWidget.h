@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "InGameHUDWidget.generated.h"
 
+class ABomberManCharacter;
 class ABomberManPlayerState;
 
 /**
@@ -20,13 +21,27 @@ public:
 	/** Sets the player 1's player state
 	*	@param PlayerState Player state of player 1.
 	*/
-	void SetPlayer1State(ABomberManPlayerState* PlayerState);
+	void SetPlayer1(ABomberManCharacter* Player);
 	
 	/** Sets the player 2's player state
 	*	@param PlayerState Player state of player 1.
 	*/
-	void SetPlayer2State(ABomberManPlayerState* PlayerState);
+	void SetPlayer2(ABomberManCharacter* Player);
 
+	/** When player 1 pick up Remote bomb pick up.
+	*/
+	UFUNCTION(BlueprintNativeEvent, Category = "InGameHUD")
+	void Player1RemoteBomb(float MaxTime);
+
+	/** When player 2 pick up Remote bomb pick up.
+	*/
+	UFUNCTION(BlueprintNativeEvent, Category = "InGameHUD")
+	void Player2RemoteBomb(float MaxTime);
+
+	/** Reset the HUD.
+	*/
+	UFUNCTION(BlueprintNativeEvent, Category = "InGameHUD")
+	void Reset();
 protected:
 	/** Called every frame
 	*/
@@ -52,6 +67,16 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = "InGameHUD")
 	void SetPlayer2CurrentBombs(int32 CurrentBombs);
 
+	/** When player 1 pick up Remote bomb pick up.
+	*/
+	UFUNCTION(BlueprintNativeEvent, Category = "InGameHUD")
+	void Player1RemoteBombHide();
+
+	/** When player 2 pick up Remote bomb pick up.
+	*/
+	UFUNCTION(BlueprintNativeEvent, Category = "InGameHUD")
+	void Player2RemoteBombHide();
+
 	/** Caching the Player 1 player state
 	*/
 	UPROPERTY(BlueprintReadOnly, Category = "InGameHUD")
@@ -63,6 +88,26 @@ protected:
 	ABomberManPlayerState* Player2State;
 	
 private:
+	/** Cache previous values so as to know when value changes
+	*/
 	int32 PrevPlayer1MaxBombs, PrevPlayer1CurrentBombs;
 	int32 PrevPlayer2MaxBombs, PrevPlayer2CurrentBombs;
+
+	/** Remote bomb time elapsed
+	*/
+	bool IsPlayer1RemoteBomb;
+	bool IsPlayer2RemoteBomb;
+
+
+	UPROPERTY(BlueprintReadOnly, Category = "InGameHUD", meta = (AllowPrivateAccess = "true"))
+	float Player1RemoteBombTimeElapsed;
+
+	UPROPERTY(BlueprintReadOnly, Category = "InGameHUD", meta = (AllowPrivateAccess = "true"))
+	float Player1RemoteBombMaxTime;
+
+	UPROPERTY(BlueprintReadOnly, Category = "InGameHUD", meta = (AllowPrivateAccess = "true"))
+	float Player2RemoteBombTimeElapsed;
+
+	UPROPERTY(BlueprintReadOnly, Category = "InGameHUD", meta = (AllowPrivateAccess = "true"))
+	float Player2RemoteBombMaxTime;
 };

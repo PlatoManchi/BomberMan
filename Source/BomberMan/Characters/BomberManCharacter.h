@@ -11,6 +11,9 @@ class ABomberManController;
 class ABomb;
 class UBombPlacerComponent;
 
+// Delegates
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam (FRemoteBombPickup, float, MaxTime);
+
 UCLASS(config=Game)
 class ABomberManCharacter : public ACharacter
 {
@@ -33,6 +36,11 @@ public:
 	/** Return the bomb placer component that this character uses.
 	*/
 	FORCEINLINE UBombPlacerComponent* GetBombPlacerComponent() const { return BombPlacer; }
+
+	/** Event that will be fired when remote bomb pickup is picked.
+	*/
+	UPROPERTY(BlueprintAssignable, Category = "BomberManCharacter")
+	FRemoteBombPickup OnRemoteBombPickup;
 protected:
 	/** Called when this Pawn is possessed.
 	*	@param NewController The controller possessing this pawn

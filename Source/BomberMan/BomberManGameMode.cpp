@@ -3,6 +3,7 @@
 #include "BomberManGameMode.h"
 #include "Camera/BomberManCamera.h"
 #include "Characters/BomberManPlayerState.h"
+#include "Characters/BomberManCharacter.h"
 #include "UI/InGameHUDWidget.h"
 
 // Engine includes
@@ -58,32 +59,6 @@ void ABomberManGameMode::BeginPlay()
 	InGameHUD->AddToViewport();
 }
 
-APlayerController * ABomberManGameMode::Login(UPlayer * NewPlayer, ENetRole InRemoteRole, const FString & Portal, const FString & Options, const FUniqueNetIdRepl & UniqueId, FString & ErrorMessage)
-{
-	APlayerController* controller = Super::Login(NewPlayer, InRemoteRole, Portal, Options, UniqueId, ErrorMessage);
-
-	if (controller->IsValidLowLevel())
-	{
-		ABomberManPlayerState* playerState = Cast<ABomberManPlayerState>(controller->PlayerState);
-
-		// Initializing the player
-		if (playerState)
-		{
-			// Setting player health
-			playerState->MaxPlayerHealth = 1.0f;
-			playerState->PlayerHealth = playerState->MaxPlayerHealth;
-			
-			// Setting the bombs available
-			playerState->MaxBombsAvailable = 1;
-			playerState->CurrentBombsAvailable = playerState->MaxBombsAvailable;
-
-			// Speed boost
-			playerState->IsSpeedBoost = false;
-		}
-	}
-
-	return controller;
-}
 
 void ABomberManGameMode::PostLogin(APlayerController* NewPlayer)
 {
@@ -92,20 +67,36 @@ void ABomberManGameMode::PostLogin(APlayerController* NewPlayer)
 	if (NewPlayer && InGameHUD)
 	{
 		ABomberManPlayerState* playerState = Cast<ABomberManPlayerState>(NewPlayer->PlayerState);
-
+		ABomberManCharacter* character = Cast<ABomberManCharacter>(NewPlayer->GetPawn());
+		
 		// Initializing the player
 		if (playerState)
 		{
 			playerState->PlayerID = UGameplayStatics::GetPlayerControllerID(NewPlayer);
-			UE_LOG(LogTemp, Warning, TEXT("Player ID: %d"), playerState->PlayerID);
-			if (playerState->PlayerID == 0)
-			{
-				InGameHUD->SetPlayer1State(playerState);
-			}
+			
+			// Setting player health
+			playerState->MaxPlayerHealth = 1.0f;
+			playerState->PlayerHealth = playerState->MaxPlayerHealth;
 
-			if (playerState->PlayerID == 1)
+			// Setting the bombs available
+			playerState->MaxBombsAvailable = 1;
+			playerState->CurrentBombsAvailable = playerState->MaxBombsAvailable;
+
+			// Speed boost
+			playerState->IsSpeedBoost = false;
+
+			// Setting up UI.
+			if (character)
 			{
-				InGameHUD->SetPlayer2State(playerState);
+				if (playerState->PlayerID == 0)
+				{
+					InGameHUD->SetPlayer1(character);
+				}
+
+				if (playerState->PlayerID == 1)
+				{
+					InGameHUD->SetPlayer2(character);
+				}
 			}
 		}
 	}
