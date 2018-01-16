@@ -22,17 +22,43 @@ class BOMBERMAN_API ABomb : public AActor
 {
 	GENERATED_BODY()
 
-	// Giving full access of the bomb to the bomb placer.
-	friend class UBombPlacerComponent;
-
 public:	
 	// Sets default values for this actor's properties
 	ABomb();
+
+	/** Set the owner of this component. This is just a function to cache the character.
+	*	@param NewOwningCharacter The character that this component is attached to.
+	*/
+	UFUNCTION(BlueprintNativeEvent, Category = "Bomb")
+	void SetOwningCharacter(ABomberManCharacter* NewOwningCharacter);
+
+	/** Sets the explosion length.
+	*	@param NewExplosionLength New explosion length to set.
+	*/
+	void SetExplosionLength(int32 NewExplosionLength);
+
+	/** Set the explosion delay.
+	*	@param NewExplosionDelay New explosion delay to set.
+	*/
+	void SetExplosionDelay(float NewExplosionDelay);
+
+	/** Called to explode the bomb
+	*/
+	virtual void Explode();
+
+	/** Returns the number of blocks the explosion will happen.
+	*/
+	FORCEINLINE int32 GetExplosionLength() const { return ExplosionLength; }
+
+	/** Returns the delay for each bomb.
+	*/
+	FORCEINLINE float GetExplosionDelay() const { return ExplosionDelay; }
 
 	/** Event fires when bomb explodes
 	*/
 	UPROPERTY(BlueprintAssignable, Category = "Bomb")
 	FBombExploded OnBombExploded;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -42,13 +68,13 @@ protected:
 	*/
 	virtual void Tick(float DeltaTime) override;
 
-	/** Called to explode the bomb
-	*/
-	virtual void Explode();
-
 	/** Take damage event.
 	*/
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+
+	/** Ability to override and change the behavior
+	*/
+	virtual void SetOwningCharacter_Implementation(ABomberManCharacter* NewOwningCharacter);
 
 	/** Call back when ever the collider begin overlap with any object.
 	*	@param OverlappedComp  Pointer to PrimitiveComponent in this actor that overlapped with something in scene.
@@ -70,17 +96,16 @@ protected:
 	UFUNCTION()
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	/** Set the owner of this component. This is just a function to cache the character.
-	*	@param NewOwningCharacter The character that this component is attached to.
-	*/
-	UFUNCTION(BlueprintNativeEvent, Category = "Bomb")
-	void SetOwningCharacter(ABomberManCharacter* NewOwningCharacter);
-
 	/** Particle to play when explosion happens
 	*/
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	UParticleSystem* ExplosionParticleTemplate;
 	
+	/** The character that places this bomb on map.
+	*/
+	UPROPERTY(BlueprintReadOnly, Category = "Bomb", meta = (AllowPrivateAccess = "true"))
+	ABomberManCharacter* OwningCharacter;
+
 private:
 	/** Check for all the actors in the explosion area and damage them
 	*/
@@ -119,11 +144,6 @@ private:
 	/** Distances in all directions
 	*/
 	float leftDistance, rightDistance, upDistance, downDistance;
-
-	/** The character that places this bomb on map.
-	*/
-	UPROPERTY(BlueprintReadOnly, Category = "Bomb", meta = (AllowPrivateAccess = "true"))
-	ABomberManCharacter* OwningCharacter;
 
 	/** Collider that will take care of collisions.
 	*/

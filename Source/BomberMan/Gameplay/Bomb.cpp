@@ -49,6 +49,16 @@ ABomb::ABomb() :
 	}
 }
 
+void ABomb::SetExplosionLength(int32 NewExplosionLength)
+{
+	ExplosionLength = NewExplosionLength;
+}
+
+void ABomb::SetExplosionDelay(float NewExplosionDelay)
+{
+	ExplosionDelay = NewExplosionDelay;
+}
+
 // Called when the game starts or when spawned
 void ABomb::BeginPlay()
 {
@@ -70,11 +80,6 @@ void ABomb::Tick(float DeltaTime)
 	}
 }
 
-void ABomb::SetOwningCharacter_Implementation(ABomberManCharacter* NewOwningCharacter)
-{
-	OwningCharacter = NewOwningCharacter;
-	OnBombExploded.AddDynamic(OwningCharacter, &ABomberManCharacter::OnBombExploded);
-}
 
 void ABomb::Explode()
 {
@@ -150,6 +155,12 @@ float ABomb::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 	}
 	
 	return actualDamage;
+}
+
+void ABomb::SetOwningCharacter_Implementation(ABomberManCharacter* NewOwningCharacter)
+{
+	OwningCharacter = NewOwningCharacter;
+	OnBombExploded.AddDynamic(OwningCharacter, &ABomberManCharacter::OnBombExploded);
 }
 
 void ABomb::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult)
