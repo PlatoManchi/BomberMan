@@ -111,6 +111,6 @@ void UInGameHUDWidget::Player2RemoteBombHide_Implementation()
 
 void UInGameHUDWidget::Reset_Implementation()
 {
-	IsPlayer1RemoteBomb = false;
-	IsPlayer2RemoteBomb = false;
+	Player1RemoteBombHide();
+	Player2RemoteBombHide();
 }

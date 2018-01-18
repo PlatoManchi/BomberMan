@@ -19,6 +19,10 @@ public:
 	*/
 	ABomberManPlayerState();
 
+	/** Reset the player state as if its new.
+	*/
+	void Reset();
+
 	/** ID of the player
 	*/
 	int32 PlayerID;
