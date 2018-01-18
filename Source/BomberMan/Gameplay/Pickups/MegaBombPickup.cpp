@@ -10,7 +10,7 @@ AMegaBombPickup::AMegaBombPickup() :
 
 }
 
-void AMegaBombPickup::PickedUpBy(ABomberManCharacter* Character)
+void AMegaBombPickup::PickedUpBy_Implementation(ABomberManCharacter* Character)
 {
 	UBombPlacerComponent* bombplacerComponent = Character->GetBombPlacerComponent();
 
@@ -20,5 +20,5 @@ void AMegaBombPickup::PickedUpBy(ABomberManCharacter* Character)
 		bombplacerComponent->SetExplosionLength(bombplacerComponent->GetExplosionLength() + IncrementAmount);
 	}
 
-	Super::PickedUpBy(Character);
+	Super::PickedUpBy_Implementation(Character);
 }

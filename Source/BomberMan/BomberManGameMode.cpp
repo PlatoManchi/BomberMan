@@ -110,6 +110,8 @@ void ABomberManGameMode::Tick(float DeltaTime)
 			IsRoundOver = true;
 			RoundEndTimeElapsed = 0.0f;
 			ResetMenuHUD->SetWinningTeam(-1);
+
+			Timeout();
 		}
 
 		InGameHUD->SetTimer(MaxRoundPlayTime - RoundPlayTimeElapsed);
@@ -164,7 +166,6 @@ void ABomberManGameMode::PostLogin(APlayerController* NewPlayer)
 
 	if (!InGameHUD)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Creating hud"));
 		InGameHUD = CreateWidget<UInGameHUDWidget>(GetWorld(), InGameHUDClass);
 		InGameHUD->AddToViewport();
 		InGameHUD->SetVisibility(ESlateVisibility::Hidden);

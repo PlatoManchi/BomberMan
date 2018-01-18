@@ -44,7 +44,8 @@ public:
 
 	/** Called to explode the bomb
 	*/
-	virtual void Explode();
+	UFUNCTION(BlueprintNativeEvent, Category = "Bomb")
+	void Explode();
 
 	/** Returns the number of blocks the explosion will happen.
 	*/
@@ -95,6 +96,10 @@ protected:
 	*/
 	UFUNCTION()
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	/** Implementation
+	*/
+	virtual void Explode_Implementation();
 
 	/** Particle to play when explosion happens
 	*/

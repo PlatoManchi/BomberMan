@@ -10,7 +10,7 @@ ACarpetBombPickup::ACarpetBombPickup() :
 
 }
 
-void ACarpetBombPickup::PickedUpBy(ABomberManCharacter* Character)
+void ACarpetBombPickup::PickedUpBy_Implementation(ABomberManCharacter* Character)
 {
 	ABomberManPlayerState* playerState = Cast<ABomberManPlayerState>(Character->GetController()->PlayerState);
 
@@ -21,5 +21,5 @@ void ACarpetBombPickup::PickedUpBy(ABomberManCharacter* Character)
 		playerState->CurrentBombsAvailable += IncrementAmount;
 	}
 
-	Super::PickedUpBy(Character);
+	Super::PickedUpBy_Implementation(Character);
 }

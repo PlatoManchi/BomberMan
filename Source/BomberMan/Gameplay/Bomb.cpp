@@ -81,7 +81,7 @@ void ABomb::Tick(float DeltaTime)
 }
 
 
-void ABomb::Explode()
+void ABomb::Explode_Implementation()
 {
 	if (IsExploding)
 	{

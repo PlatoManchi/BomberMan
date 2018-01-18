@@ -34,7 +34,9 @@ protected:
 	/** When the pick up is picked up by character.
 	*	@param Character Pointer to the character that picked up this pickup.
 	*/
-	virtual void PickedUpBy(ABomberManCharacter* Character);
+	UFUNCTION(BlueprintNativeEvent, Category = "Pickup")
+	void PickedUpBy(ABomberManCharacter* Character);
+	virtual void PickedUpBy_Implementation(ABomberManCharacter* Character);
 
 	/** Call back when ever the collider begin overlap with any object.
 	*	@param OverlappedComp  Pointer to PrimitiveComponent in this actor that overlapped with something in scene.

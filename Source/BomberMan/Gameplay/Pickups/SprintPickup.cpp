@@ -12,7 +12,7 @@ ASprintPickup::ASprintPickup() :
 {
 }
 
-void ASprintPickup::PickedUpBy(ABomberManCharacter* Character)
+void ASprintPickup::PickedUpBy_Implementation(ABomberManCharacter* Character)
 {
 	ABomberManPlayerState* playerState = Cast<ABomberManPlayerState>(Character->GetController()->PlayerState);
 
@@ -23,5 +23,5 @@ void ASprintPickup::PickedUpBy(ABomberManCharacter* Character)
 		Character->GetCharacterMovement()->MaxWalkSpeed *= SpeedMultiplier;
 	}
 	
-	Super::PickedUpBy(Character);
+	Super::PickedUpBy_Implementation(Character);
 }

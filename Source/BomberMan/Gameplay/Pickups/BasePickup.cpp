@@ -43,7 +43,7 @@ void ABasePickup::Tick(float DeltaTime)
 	VisualComponent->SetRelativeRotation(FRotator::MakeFromEuler(FVector(0, 0, VisualComponentRotationAngle)));
 }
 
-void ABasePickup::PickedUpBy(ABomberManCharacter* Character)
+void ABasePickup::PickedUpBy_Implementation(ABomberManCharacter* Character)
 {
 	Destroy();
 }

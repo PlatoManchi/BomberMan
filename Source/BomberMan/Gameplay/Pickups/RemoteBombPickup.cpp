@@ -10,7 +10,7 @@ ARemoteBombPickup::ARemoteBombPickup() :
 
 }
 
-void ARemoteBombPickup::PickedUpBy(ABomberManCharacter* Character)
+void ARemoteBombPickup::PickedUpBy_Implementation(ABomberManCharacter* Character)
 {
 	UBombPlacerComponent* bombPlacer = Character->SetBombPlacerClass(URemoteBombPlacerComponent::StaticClass());
 	URemoteBombPlacerComponent* remoteBombPlacer = Cast<URemoteBombPlacerComponent>(bombPlacer);
@@ -25,5 +25,5 @@ void ARemoteBombPickup::PickedUpBy(ABomberManCharacter* Character)
 		Character->OnRemoteBombPickup.Broadcast(MaxPowerupTime);
 	}
 
-	Super::PickedUpBy(Character);
+	Super::PickedUpBy_Implementation(Character);
 }

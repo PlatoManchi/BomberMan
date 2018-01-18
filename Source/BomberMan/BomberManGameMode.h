@@ -49,6 +49,9 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "BomberManGameMode")
 	void ShowMainMenu();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "BomberManGameMode")
+	void Timeout();
+
 	/** Pointer that holds the ingame hud widget
 	*/
 	UPROPERTY()

@@ -22,7 +22,7 @@ protected:
 
 	/** Called when this pick up is picked by player.
 	*/
-	virtual void PickedUpBy(ABomberManCharacter* Character) override;
+	virtual void PickedUpBy_Implementation(ABomberManCharacter* Character) override;
 	
 private:
 	/** Number of extra tiles to add to explosion
