@@ -42,6 +42,11 @@ public:
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category = "InGameHUD")
 	void Reset();
+
+	/** Set the timer in UI to show re
+	*/
+	UFUNCTION(BlueprintImplementableEvent, Category = "InGameHUD")
+	void SetTimer(float RemainingTime);
 protected:
 	/** Called every frame
 	*/

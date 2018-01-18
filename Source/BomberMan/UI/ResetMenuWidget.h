@@ -21,4 +21,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void UpdateScore();
 	
+	/** Set the winning team for this round.
+	*	@param PlayerID Id of player that won the game. If draw then -1
+	*/
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetWinningTeam(int32 PlayerID);
 };
