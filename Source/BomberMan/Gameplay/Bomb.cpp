@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Bomb.h"
+#include "BomberManGameMode.h"
 #include "Gameplay/LevelCreator.h"
 #include "Characters/BomberManCharacter.h"
 
@@ -66,6 +67,8 @@ void ABomb::BeginPlay()
 	
 	BoxCollider->OnComponentBeginOverlap.AddDynamic(this, &ABomb::OnOverlapBegin);
 	BoxCollider->OnComponentEndOverlap.AddDynamic(this, &ABomb::OnOverlapEnd);
+
+	BomberManGameMode = Cast<ABomberManGameMode>(GetWorld()->GetAuthGameMode());
 }
 
 // Called every frame
@@ -73,6 +76,8 @@ void ABomb::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
+	if (BomberManGameMode->GetIsRoundOver()) return;
+
 	TimeElapsed += DeltaTime;
 	if (TimeElapsed >= ExplosionDelay)
 	{

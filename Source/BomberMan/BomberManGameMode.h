@@ -23,6 +23,9 @@ public:
 	*/
 	void PlayerDead(int32 PlayerID);
 
+	/** Return true if round is over.
+	*/
+	FORCEINLINE bool GetIsRoundOver() const { return IsRoundOver; }
 protected:
 	// Called once when game starts
 	void BeginPlay() override;

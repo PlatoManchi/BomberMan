@@ -13,6 +13,7 @@ class UBombPlacerComponent;
 class UBoxComponent;
 class USceneComponent;
 class ABomberManCharacter;
+class ABomberManGameMode;
 
 // Delegate decelerations
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBombExploded, ABomb*, Bomb);
@@ -124,6 +125,10 @@ private:
 	*/
 	bool IsExploding;
 	
+	/** Game mode
+	*/
+	ABomberManGameMode* BomberManGameMode;
+
 	/** If bomb is spawned on player then bomb will displace player or player can get stuck inside bomb.
 		To avoid this, spawn bomb with overlap if there are no players overlapping with bomb then make it block all
 	*/

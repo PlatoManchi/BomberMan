@@ -6,6 +6,7 @@
 #include "Characters/BomberManCharacter.h"
 #include "Gameplay/LevelCreator.h"
 #include "Gameplay/Pickups/BasePickup.h"
+#include "Gameplay/Bomb.h"
 #include "UI/InGameHUDWidget.h"
 #include "UI/ResetMenuWidget.h"
 
@@ -13,7 +14,7 @@
 #include "EngineUtils.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 ABomberManGameMode::ABomberManGameMode() :
@@ -144,6 +145,12 @@ void ABomberManGameMode::Tick(float DeltaTime)
 	{
 		RoundEndTimeElapsed -= DeltaTime;
 
+		// Disable movement
+		for (TActorIterator<ABomberManCharacter> itr(GetWorld()); itr; ++itr)
+		{
+			(*itr)->GetCharacterMovement()->SetActive(false);
+		}
+
 		if (RoundEndTimeElapsed <= 0.0f)
 		{
 			if (ResetMenuHUD && ResetMenuHUD->GetVisibility() != ESlateVisibility::Visible)
@@ -255,6 +262,13 @@ void ABomberManGameMode::Reset()
 	/** Remove all pickups on map
 	*/
 	for (TActorIterator<ABasePickup> itr(GetWorld()); itr; ++itr)
+	{
+		(*itr)->Destroy();
+	}
+
+	/** Remove all bombs that are present in map
+	*/
+	for (TActorIterator<ABomb> itr(GetWorld()); itr; ++itr)
 	{
 		(*itr)->Destroy();
 	}
