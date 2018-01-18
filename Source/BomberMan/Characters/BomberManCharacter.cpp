@@ -2,11 +2,13 @@
 
 #include "BomberManCharacter.h"
 #include "BomberManPlayerState.h"
+#include "BomberManGameMode.h"
 #include "Gameplay/Bomb.h"
 #include "Weapon/BombPlacerComponent.h"
 
 // Engine includes
 #include "HeadMountedDisplayFunctionLibrary.h"
+#include "Animation/SkeletalMeshActor.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -44,10 +46,17 @@ ABomberManCharacter::ABomberManCharacter()
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
 
+void ABomberManCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	InitWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
+}
+
 UBombPlacerComponent* ABomberManCharacter::SetBombPlacerClass(TSubclassOf<UBombPlacerComponent> NewBombPlacer)
 {
 	int32 ExplosionLength = BombPlacer->GetExplosionLength();
-	
+
 	// Destroy previous bomb placer
 	BombPlacer->DestroyComponent();
 
@@ -96,18 +105,31 @@ float ABomberManCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Da
 {
 	float actualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	GetMesh()->SetSimulatePhysics(true);
+	ABomberManGameMode* gamemode = Cast<ABomberManGameMode>(GetWorld()->GetAuthGameMode());
+	ABomberManPlayerState* playerstate = Cast<ABomberManPlayerState>(Controller->PlayerState);
+
+	if (gamemode)
+	{
+		gamemode->PlayerDead(playerstate->PlayerID);
+	}
+
+	GetCharacterMovement()->SetActive(false);
+
+	// Make character ragdoll and apply impulse in opposite direction of the bomb
 	FVector direction = GetActorLocation() - DamageCauser->GetActorLocation();
 	float distance = direction.Size();
 	direction = direction / distance;
 
-	float force = FMath::Lerp(80000, 35000, distance / 500.0f);
-
-	GetMesh()->AddImpulse(direction * force);
+	float force = FMath::Lerp(50000, 5000, distance / 500.0f);
+	PlayerDead(direction * force);
 
 	return actualDamage;
 }
 
+void ABomberManCharacter::PlayerDead_Implementation(FVector Force)
+{
+	GetMesh()->SetVisibility(false);
+}
 
 void ABomberManCharacter::MoveForward(float Value)
 {
@@ -125,12 +147,12 @@ void ABomberManCharacter::MoveForward(float Value)
 
 void ABomberManCharacter::MoveRight(float Value)
 {
-	if ( (Controller != NULL) && (Value != 0.0f) )
+	if ((Controller != NULL) && (Value != 0.0f))
 	{
 		// find out which way is right
 		const FRotator Rotation = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->GetCameraRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
-	
+
 		// get right vector 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
@@ -161,4 +183,13 @@ void ABomberManCharacter::OnBombExploded(ABomb* Bomb)
 			playerState->CurrentBombsAvailable = playerState->MaxBombsAvailable;
 		}
 	}
+}
+
+void ABomberManCharacter::Reset_Implementation()
+{
+	GetMesh()->SetVisibility(true);
+	GetCharacterMovement()->SetActive(true);
+	GetCharacterMovement()->MaxWalkSpeed = InitWalkSpeed;
+
+	SetBombPlacerClass(UBombPlacerComponent::StaticClass());
 }

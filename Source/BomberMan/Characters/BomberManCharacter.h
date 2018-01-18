@@ -10,7 +10,7 @@
 class ABomberManController;
 class ABomb;
 class UBombPlacerComponent;
-
+class USkeletalMesh;
 // Delegates
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam (FRemoteBombPickup, float, MaxTime);
 
@@ -33,6 +33,11 @@ public:
 	*/
 	UBombPlacerComponent* SetBombPlacerClass(TSubclassOf<UBombPlacerComponent> NewBombPlacer);
 
+	/** Resets character
+	*/
+	UFUNCTION(BlueprintNativeEvent, Category = "BomberManCharacter")
+	void Reset();
+
 	/** Return the bomb placer component that this character uses.
 	*/
 	FORCEINLINE UBombPlacerComponent* GetBombPlacerComponent() const { return BombPlacer; }
@@ -42,6 +47,10 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "BomberManCharacter")
 	FRemoteBombPickup OnRemoteBombPickup;
 protected:
+	/** Called at the start of the game.
+	*/
+	virtual void BeginPlay() override;
+
 	/** Called when this Pawn is possessed.
 	*	@param NewController The controller possessing this pawn
 	*/
@@ -79,7 +88,15 @@ protected:
 	*/
 	UFUNCTION()
 	void OnBombExploded(ABomb* Bomb);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "BomberManCharacter")
+	void PlayerDead(FVector Force);
+
 private:
+	/** Cache the initial walk speed so that it can be used while resetting the character
+	*/
+	float InitWalkSpeed;
+	
 	/** Bomb placer that acts like gun and is responsible to place the bombs
 	*/
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
