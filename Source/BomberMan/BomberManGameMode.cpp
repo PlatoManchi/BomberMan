@@ -4,7 +4,10 @@
 #include "Camera/BomberManCamera.h"
 #include "Characters/BomberManPlayerState.h"
 #include "Characters/BomberManCharacter.h"
+#include "Gameplay/LevelCreator.h"
+#include "Gameplay/Pickups/BasePickup.h"
 #include "UI/InGameHUDWidget.h"
+#include "UI/ResetMenuWidget.h"
 
 // Engine includes
 #include "EngineUtils.h"
@@ -14,8 +17,18 @@
 
 
 ABomberManGameMode::ABomberManGameMode() :
-	InGameHUD(nullptr)
+	InGameHUD(nullptr),
+	IsPlayer1Dead(false),
+	IsPlayer2Dead(false),
+	IsRoundOver(false),
+	RoundEndTimeElapsed(0.0f),
+	ResetMenuHUD(nullptr),
+	Player1Score(0),
+	Player2Score(0)
 {
+	PrimaryActorTick.bStartWithTickEnabled = true;
+	PrimaryActorTick.bCanEverTick = true;
+
 	// Set default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprints/Characters/BP_BomberManCharacter"));
 	if (PlayerPawnBPClass.Class != NULL)
@@ -40,7 +53,23 @@ ABomberManGameMode::ABomberManGameMode() :
 		InGameHUDClass = InGameHUDBPClass.Class;
 	}
 	
+	// Set default controller class to our Blueprinted controller
+	static ConstructorHelpers::FClassFinder<UUserWidget> MainMenuHUDBPClass(TEXT("/Game/Blueprints/UI/WBP_MainMenuWidget"));
+	if (MainMenuHUDBPClass.Class != NULL)
+	{
+		MainMenuHUDClass = MainMenuHUDBPClass.Class;
+	}
+	
+	// Set default controller class to our Blueprinted controller
+	static ConstructorHelpers::FClassFinder<UUserWidget> ResetHUDBPClass(TEXT("/Game/Blueprints/UI/WBP_ResetMenuWidget"));
+	if (ResetHUDBPClass.Class != NULL)
+	{
+		ResetHUDClass = ResetHUDBPClass.Class;
+	}
+	
 	InGameHUD = CreateWidget<UInGameHUDWidget>(GetWorld(), InGameHUDClass);
+	ResetMenuHUD = CreateWidget<UResetMenuWidget>(GetWorld(), ResetHUDClass);
+	
 }
 
 void ABomberManGameMode::BeginPlay()
@@ -56,9 +85,68 @@ void ABomberManGameMode::BeginPlay()
 		UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(bombermanCamera);
 	}
 
+	MainMenuHUD = CreateWidget<UUserWidget>(GetWorld(), MainMenuHUDClass);
+	MainMenuHUD->SetVisibility(ESlateVisibility::Visible);
+	
+	MainMenuHUD->AddToViewport();
+
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = true;
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetInputMode(FInputModeUIOnly());
+
 	InGameHUD->AddToViewport();
+	InGameHUD->SetVisibility(ESlateVisibility::Hidden);
+
+	ResetMenuHUD->AddToViewport();
+	ResetMenuHUD->SetVisibility(ESlateVisibility::Hidden);
 }
 
+void ABomberManGameMode::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (!IsRoundOver)
+	{
+		if (IsPlayer1Dead || IsPlayer2Dead)
+		{
+			IsRoundOver = true;
+			
+			RoundEndTimeElapsed = 2.0f;
+
+			if (IsPlayer1Dead && IsPlayer2Dead)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Draw"));
+			}
+			else if (IsPlayer1Dead)
+			{
+				Player2Score++;
+			}
+			else if (IsPlayer2Dead)
+			{
+				Player1Score++;
+			}
+		}
+	}
+	
+
+	if (IsRoundOver && RoundEndTimeElapsed > 0.0f)
+	{
+		RoundEndTimeElapsed -= DeltaTime;
+
+		if (RoundEndTimeElapsed <= 0.0f)
+		{
+			if (ResetMenuHUD && ResetMenuHUD->GetVisibility() != ESlateVisibility::Visible)
+			{
+				ResetMenuHUD->UpdateScore();
+				InGameHUD->SetVisibility(ESlateVisibility::Hidden);
+
+				ResetMenuHUD->SetVisibility(ESlateVisibility::Visible);
+
+				UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = true;
+				UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetInputMode(FInputModeUIOnly());
+			}
+		}
+	}
+}
 
 void ABomberManGameMode::PostLogin(APlayerController* NewPlayer)
 {
@@ -73,17 +161,7 @@ void ABomberManGameMode::PostLogin(APlayerController* NewPlayer)
 		if (playerState)
 		{
 			playerState->PlayerID = UGameplayStatics::GetPlayerControllerID(NewPlayer);
-			
-			// Setting player health
-			playerState->MaxPlayerHealth = 1.0f;
-			playerState->PlayerHealth = playerState->MaxPlayerHealth;
-
-			// Setting the bombs available
-			playerState->MaxBombsAvailable = 1;
-			playerState->CurrentBombsAvailable = playerState->MaxBombsAvailable;
-
-			// Speed boost
-			playerState->IsSpeedBoost = false;
+			playerState->Reset();
 
 			// Setting up UI.
 			if (character)
@@ -100,4 +178,70 @@ void ABomberManGameMode::PostLogin(APlayerController* NewPlayer)
 			}
 		}
 	}
+}
+
+void ABomberManGameMode::ResetScore()
+{
+	Player1Score = 0.0f;
+	Player2Score = 0.0f;
+}
+
+
+void ABomberManGameMode::PlayerDead(int32 PlayerID)
+{
+	if (PlayerID == 0)
+	{
+		IsPlayer1Dead = true;
+	}
+	if (PlayerID == 1)
+	{
+		IsPlayer2Dead = true;
+	}
+}
+
+void ABomberManGameMode::Reset()
+{
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetInputMode(FInputModeGameOnly());
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = false;
+
+	InGameHUD->SetVisibility(ESlateVisibility::Visible);
+	ResetMenuHUD->SetVisibility(ESlateVisibility::Hidden);
+	MainMenuHUD->SetVisibility(ESlateVisibility::Hidden);
+
+	IsRoundOver = false;
+
+	IsPlayer1Dead = false;
+	IsPlayer2Dead = false;
+
+	for (TActorIterator<AController> itr(GetWorld()); itr; ++itr)
+	{
+		AController* controller = *itr;
+		ABomberManPlayerState* playerstate = Cast<ABomberManPlayerState>(controller->PlayerState);
+		playerstate->Reset();
+	}
+
+	for (TActorIterator<ABomberManCharacter> itr(GetWorld()); itr; ++itr)
+	{
+		(*itr)->Reset();
+	}
+
+	for (TActorIterator<ALevelCreator> itr(GetWorld()); itr; ++itr)
+	{
+		(*itr)->ResetLevel();
+	}
+
+	InGameHUD->Reset();
+
+	/** Remove all pickups on map
+	*/
+	for (TActorIterator<ABasePickup> itr(GetWorld()); itr; ++itr)
+	{
+		(*itr)->Destroy();
+	}
+}
+
+void ABomberManGameMode::ShowMainMenu()
+{
+	MainMenuHUD->SetVisibility(ESlateVisibility::Visible);
+	ResetMenuHUD->SetVisibility(ESlateVisibility::Hidden);
 }
