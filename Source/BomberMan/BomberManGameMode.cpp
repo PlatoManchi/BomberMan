@@ -20,11 +20,13 @@ ABomberManGameMode::ABomberManGameMode() :
 	InGameHUD(nullptr),
 	IsPlayer1Dead(false),
 	IsPlayer2Dead(false),
-	IsRoundOver(false),
-	RoundEndTimeElapsed(0.0f),
+	IsRoundOver(true),
+	RoundEndTimeElapsed(-1.0f),
 	ResetMenuHUD(nullptr),
 	Player1Score(0),
-	Player2Score(0)
+	Player2Score(0),
+	MaxRoundPlayTime(180),
+	RoundPlayTimeElapsed(0)
 {
 	PrimaryActorTick.bStartWithTickEnabled = true;
 	PrimaryActorTick.bCanEverTick = true;
@@ -106,6 +108,16 @@ void ABomberManGameMode::Tick(float DeltaTime)
 
 	if (!IsRoundOver)
 	{
+		RoundPlayTimeElapsed += DeltaTime;
+		if (RoundPlayTimeElapsed >= MaxRoundPlayTime)
+		{
+			IsRoundOver = true;
+			RoundEndTimeElapsed = 0.0f;
+			ResetMenuHUD->SetWinningTeam(-1);
+		}
+
+		InGameHUD->SetTimer(MaxRoundPlayTime - RoundPlayTimeElapsed);
+
 		if (IsPlayer1Dead || IsPlayer2Dead)
 		{
 			IsRoundOver = true;
@@ -114,21 +126,23 @@ void ABomberManGameMode::Tick(float DeltaTime)
 
 			if (IsPlayer1Dead && IsPlayer2Dead)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Draw"));
+				ResetMenuHUD->SetWinningTeam(-1);
 			}
 			else if (IsPlayer1Dead)
 			{
 				Player2Score++;
+				ResetMenuHUD->SetWinningTeam(1);
 			}
 			else if (IsPlayer2Dead)
 			{
 				Player1Score++;
+				ResetMenuHUD->SetWinningTeam(0);
 			}
 		}
 	}
 	
 
-	if (IsRoundOver && RoundEndTimeElapsed > 0.0f)
+	if (IsRoundOver && RoundEndTimeElapsed >= 0.0f)
 	{
 		RoundEndTimeElapsed -= DeltaTime;
 
@@ -209,6 +223,7 @@ void ABomberManGameMode::Reset()
 	MainMenuHUD->SetVisibility(ESlateVisibility::Hidden);
 
 	IsRoundOver = false;
+	RoundPlayTimeElapsed = 0;
 
 	IsPlayer1Dead = false;
 	IsPlayer2Dead = false;

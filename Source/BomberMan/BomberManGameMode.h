@@ -104,6 +104,14 @@ private:
 	/** How much time elapsed since round finished.
 	*/
 	float RoundEndTimeElapsed;
+
+	/** Time elapsed since round started.
+	*/
+	float RoundPlayTimeElapsed;
+
+	/** Total round time.
+	*/
+	float MaxRoundPlayTime;
 };
 
 
