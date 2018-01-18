@@ -39,11 +39,13 @@ ALevelCreator::ALevelCreator()
 
 void ALevelCreator::ResetLevel()
 {
-	UsedIndestructibleBlocksArray = UsedIndestructibleBlocksArray;
+	UnusedIndestructibleBlocksArray.Append(UsedIndestructibleBlocksArray);
 	UsedIndestructibleBlocksArray.Empty();
 
-	UnusedDestructibleBlocksArray = UsedDestructibleBlocksArray;
+	UnusedDestructibleBlocksArray.Append(UsedDestructibleBlocksArray);
 	UsedDestructibleBlocksArray.Empty();
+
+	PopulateMapData();
 
 	/** Creating the initial indestructible blocks that will be there everywhere
 	*/
@@ -68,7 +70,6 @@ void ALevelCreator::ResetLevel()
 			}
 		}
 	}
-	
 }
 
 // Called when the game starts or when spawned
@@ -77,8 +78,6 @@ void ALevelCreator::BeginPlay()
 	Super::BeginPlay();
 	
 	ResetLevel();
-
-	
 }
 
 // Called every frame
@@ -136,6 +135,43 @@ ABaseBlock * ALevelCreator::GetDestructibleBlock()
 	// Pushing the result into the used indestructible block
 	UsedDestructibleBlocksArray.Add(result);
 	return result;
+}
+
+void ALevelCreator::PopulateMapData()
+{
+	ProbabilityArray = DefaultProbabilityArray;
+
+	for (int32 y = 0; y < MAP_HEIGHT; ++y)
+	{
+		for (int32 x = 0; x < MAP_WIDTH; ++x)
+		{
+			if (y % 2 != 0 && x % 2 != 0)
+			{
+				MapData[y][x] = 1;
+			}
+			else
+			{
+				// Spawn the destructible blocks based on the probability pool
+				int32 index = FMath::RandRange(0, ProbabilityArray.Num() - 1);
+				MapData[y][x] = ProbabilityArray[index];
+				ProbabilityArray.RemoveAt(index);
+				if (ProbabilityArray.Num() == 0)
+				{
+					ProbabilityArray = DefaultProbabilityArray;
+				}
+			}
+		}
+	}
+
+	// Clearing the spawn points.
+	// Top left
+	MapData[0][0] = MapData[0][1] = MapData[1][0] = MapData[2][0] = MapData[2][1] = 0;
+	// Top right
+	MapData[0][MAP_WIDTH - 1] = MapData[0][MAP_WIDTH - 2] = MapData[1][MAP_WIDTH - 1] = MapData[2][MAP_WIDTH - 1] = MapData[2][MAP_WIDTH - 2] = 0;
+	// Bottom left
+	MapData[MAP_HEIGHT - 1][0] = MapData[MAP_HEIGHT - 1][1] = MapData[MAP_HEIGHT - 2][0] = MapData[MAP_HEIGHT - 3][0] = MapData[MAP_HEIGHT - 3][1] = 0;
+	// Bottom right
+	MapData[MAP_HEIGHT - 1][MAP_WIDTH - 1] = MapData[MAP_HEIGHT - 1][MAP_WIDTH - 2] = MapData[MAP_HEIGHT - 2][MAP_WIDTH - 1] = MapData[MAP_HEIGHT - 3][MAP_WIDTH - 1] = MapData[MAP_HEIGHT - 3][MAP_WIDTH - 2] = 0;
 }
 
 void ALevelCreator::RecollectDestructibleBlock(ABaseBlock* Block)

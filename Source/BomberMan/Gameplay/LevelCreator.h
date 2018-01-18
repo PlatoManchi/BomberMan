@@ -69,6 +69,10 @@ private:
 	*/
 	ABaseBlock* GetDestructibleBlock();
 
+	/** Creates the map data
+	*/
+	void PopulateMapData();
+
 	/** Used to pool the indestructible blocks.
 	*/
 	TArray<ABaseBlock*> UsedIndestructibleBlocksArray, UnusedIndestructibleBlocksArray;
@@ -95,4 +99,21 @@ private:
 		{ 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0 },
 		{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 	};
+
+	/** Probabilities of drops. Creating a pseudo random pool so that probability always works.
+	*	Instead of relaying on random and hoping that it works.
+	*	To get 30% drop rate, out of 30 sample set 9 times has to be positive hit.
+	*	So create a pool of 30 sample set and have 9 positive outputs.
+	*	0 - Walkable tile
+	*	2 - Destructible tile
+	*/
+	UPROPERTY(EditDefaultsOnly, Category = "Block|DestructibleBlock")
+		TArray<int32> DefaultProbabilityArray = {
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
+
+	/** Probabilities to be used
+	*/
+	TArray<int32> ProbabilityArray;
 };
