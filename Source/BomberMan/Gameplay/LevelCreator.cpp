@@ -2,10 +2,15 @@
 
 #include "LevelCreator.h"
 #include "BaseBlock.h"
+#include "Characters/BomberManCharacter.h"
 
 // Engine includes
+#include "EngineUtils.h"
 #include "Components/StaticMeshComponent.h"
+#include "GameFramework/PlayerStart.h"
+#include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
+
 
 const float ALevelCreator::TILE_X_LENGTH = 100.0f;
 const float ALevelCreator::TILE_Y_LENGTH = 100.0f;
@@ -69,6 +74,19 @@ void ALevelCreator::ResetLevel()
 				block->SetActorLocation(location);
 			}
 		}
+	}
+	TArray<AActor*> spawnpoints;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), spawnpoints);
+
+	for (TActorIterator<ABomberManCharacter> itr(GetWorld()); itr; ++itr)
+	{
+		ABomberManCharacter* character = (*itr);
+		int32 index = FMath::RandRange(0, spawnpoints.Num() - 1);
+		AActor* point = spawnpoints[index];
+		spawnpoints.RemoveAt(index);
+
+		character->SetActorLocation(point->GetActorLocation());
+		character->SetActorRotation(point->GetActorRotation());
 	}
 }
 
