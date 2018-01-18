@@ -23,6 +23,7 @@ ABomberManGameMode::ABomberManGameMode() :
 	IsRoundOver(true),
 	RoundEndTimeElapsed(-1.0f),
 	ResetMenuHUD(nullptr),
+	MainMenuHUD(nullptr),
 	Player1Score(0),
 	Player2Score(0),
 	MaxRoundPlayTime(180),
@@ -68,10 +69,6 @@ ABomberManGameMode::ABomberManGameMode() :
 	{
 		ResetHUDClass = ResetHUDBPClass.Class;
 	}
-	
-	InGameHUD = CreateWidget<UInGameHUDWidget>(GetWorld(), InGameHUDClass);
-	ResetMenuHUD = CreateWidget<UResetMenuWidget>(GetWorld(), ResetHUDClass);
-	
 }
 
 void ABomberManGameMode::BeginPlay()
@@ -87,6 +84,8 @@ void ABomberManGameMode::BeginPlay()
 		UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(bombermanCamera);
 	}
 
+	ResetMenuHUD = CreateWidget<UResetMenuWidget>(GetWorld(), ResetHUDClass);
+	
 	MainMenuHUD = CreateWidget<UUserWidget>(GetWorld(), MainMenuHUDClass);
 	MainMenuHUD->SetVisibility(ESlateVisibility::Visible);
 	
@@ -94,9 +93,6 @@ void ABomberManGameMode::BeginPlay()
 
 	UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = true;
 	UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetInputMode(FInputModeUIOnly());
-
-	InGameHUD->AddToViewport();
-	InGameHUD->SetVisibility(ESlateVisibility::Hidden);
 
 	ResetMenuHUD->AddToViewport();
 	ResetMenuHUD->SetVisibility(ESlateVisibility::Hidden);
@@ -166,6 +162,14 @@ void ABomberManGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
 
+	if (!InGameHUD)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Creating hud"));
+		InGameHUD = CreateWidget<UInGameHUDWidget>(GetWorld(), InGameHUDClass);
+		InGameHUD->AddToViewport();
+		InGameHUD->SetVisibility(ESlateVisibility::Hidden);
+	}
+
 	if (NewPlayer && InGameHUD)
 	{
 		ABomberManPlayerState* playerState = Cast<ABomberManPlayerState>(NewPlayer->PlayerState);
@@ -218,9 +222,9 @@ void ABomberManGameMode::Reset()
 	UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetInputMode(FInputModeGameOnly());
 	UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = false;
 
-	InGameHUD->SetVisibility(ESlateVisibility::Visible);
-	ResetMenuHUD->SetVisibility(ESlateVisibility::Hidden);
-	MainMenuHUD->SetVisibility(ESlateVisibility::Hidden);
+	if(InGameHUD) InGameHUD->SetVisibility(ESlateVisibility::Visible);
+	if(ResetMenuHUD) ResetMenuHUD->SetVisibility(ESlateVisibility::Hidden);
+	if(MainMenuHUD) MainMenuHUD->SetVisibility(ESlateVisibility::Hidden);
 
 	IsRoundOver = false;
 	RoundPlayTimeElapsed = 0;
@@ -245,7 +249,7 @@ void ABomberManGameMode::Reset()
 		(*itr)->ResetLevel();
 	}
 
-	InGameHUD->Reset();
+	if(InGameHUD) InGameHUD->Reset();
 
 	/** Remove all pickups on map
 	*/
